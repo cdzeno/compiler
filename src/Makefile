@@ -3,14 +3,19 @@ JFLEX = jflex
 CUP = ../lib/java_cup.jar
 CUPFLAGS = -Xlint:deprecation
 CLASSPATH = -cp ".:$(CUP)"
+SCANNER = Scanner
+LEXER = Lexer
 PARSER = Parser
-MAIN = Calcolatrice
+MAIN = Compiler
 
 all: lexer parser
 	$(JCC) $(CLASSPATH) $(MAIN).java
 	
 lexer: expr.lex
 	$(JFLEX) expr.lex
+
+testLexer: $(SCANNER).java $(LEXER).java
+	$(JCC) -cp . $(LEXER).java 
 
 parser: expr.cup
 	java -jar $(CUP) expr.cup
