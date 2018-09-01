@@ -1,6 +1,8 @@
+import java_cup.runtime.*;
 
 %%
 
+%cup
 %unicode
 
 IDENT                = [A-Za-z] [A-Za-z0-9]*
@@ -14,40 +16,46 @@ COMMENT              = "//"{ALL_CHARS}*
 MULTILINE_ISTR       = {SPACE}? "&" {SPACE}? {COMMENT}? {CR}
 
 %class Scanner
-%function getNext
-%type Token
-
 %char
 %line
 %column
 
+%{  //codice per associare la Symbol Factory
+    ComplexSymbolFactory sf;
+    
+    public Scanner(java.io.Reader in, ComplexSymbolFactory sf) {
+      this(in);
+      this.sf = sf;
+    }
+%}
+
 %%
-"+"                   {return new Token(TipoToken.SUM);}
-"-"                   {return new Token(TipoToken.MINUS);}
-"*"                   {return new Token(TipoToken.MUL);}
-"/"                   {return new Token(TipoToken.DIV);}
-"%"                   {return new Token(TipoToken.MOD);}
-"="                   {return new Token(TipoToken.EQU);}
-"("                   {return new Token(TipoToken.TONDA_A);}
-")"                   {return new Token(TipoToken.TONDA_C);}
-"?"                   {return new Token(TipoToken.PUNTO_INT);}
-":"                   {return new Token(TipoToken.DUE_PUNTI);}
+"+"                   {return sf.newSymbol("SUM", ParserSym.SUM);}
+"-"                   {return sf.newSymbol("SUB", ParserSym.SUB);}
+"*"                   {return sf.newSymbol("MUL", ParserSym.MUL);}
+"/"                   {return sf.newSymbol("DIV", ParserSym.DIV);}
+"%"                   {return sf.newSymbol("MOD", ParserSym.MOD);}
+"="                   {return sf.newSymbol("EQU", ParserSym.EQU);}
+"("                   {return sf.newSymbol("TONDA_A", ParserSym.TONDA_A);}
+")"                   {return sf.newSymbol("TONDA_C", ParserSym.TONDA_C);}
+"?"                   {return sf.newSymbol("PUNTO_INT", ParserSym.PUNTO_INT);}
+":"                   {return sf.newSymbol("DUE_PUNTI", ParserSym.DUE_PUNTI);}
 
-"input"               {return new Token(TipoToken.INPUT);}
-"output"              {return new Token(TipoToken.OUTPUT);}
-"loop"                {return new Token(TipoToken.LOOP);}
-"endLoop"             {return new Token(TipoToken.ENDLOOP);}
-"newLine"             {return new Token(TipoToken.NEWLINE);}
+"input"               {return sf.newSymbol("INPUT", ParserSym.INPUT);}
+"output"              {return sf.newSymbol("OUTPUT", ParserSym.OUTPUT);}
+"loop"                {return sf.newSymbol("LOOP", ParserSym.LOOP);}
+"endLoop"             {return sf.newSymbol("ENDLOOP", ParserSym.ENDLOOP);}
+"newLine"             {return sf.newSymbol("NEWLINE", ParserSym.NEWLINE);}
 
-{IDENT}               {return new Token(TipoToken.IDENT, yytext());}
-{DEC_LETT}            {return new Token(TipoToken.DEC_LETT, Integer.parseInt(yytext()));}
-{HEX_LETT}            {return new Token(TipoToken.HEX_LETT, Integer.parseInt(yytext(), 16));}
+{IDENT}               {return sf.newSymbol("IDENT", ParserSym.IDENT, yytext());}
+{DEC_LETT}            {return sf.newSymbol("LETT", ParserSym.LETT, new Integer(yytext()));}
+{HEX_LETT}            {return sf.newSymbol("LETT", ParserSym.LETT, new Integer(Integer.parseInt(yytext(), 16)));}
 
-{CR}                  {return new Token(TipoToken.CR);}
-\"{STRING_CHARS}*\"   {return new Token(TipoToken.STRINGA, yytext());}
+{CR}                  {return sf.newSymbol("CR", ParserSym.CR);}
+\"{STRING_CHARS}*\"   {return sf.newSymbol("STRING", ParserSym.STRING, yytext());}
 {COMMENT}             { }
 {SPACE}               { }
 {MULTILINE_ISTR}      { }
 
-<<EOF>>               {return new Token(TipoToken.EOF);}
-.                     {return new Token(TipoToken.ERROR, yytext());}
+<<EOF>>               {return sf.newSymbol("EOF", ParserSym.EOF);}
+.                     {return sf.newSymbol("ERROR", ParserSym.ERROR);}
