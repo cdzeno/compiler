@@ -7,6 +7,6 @@ loop x * y
 	x = x - 1 
 	y = y - 1
    cont = cont + 1
-end
+endLoop
 output cont
 newLine

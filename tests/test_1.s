@@ -5,7 +5,6 @@ loop y
     resto = x % y 
     x = y
     y = resto
-endloop
-
+endLoop
 output "mcd = " x
 newLine
