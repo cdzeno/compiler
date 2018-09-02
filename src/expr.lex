@@ -4,6 +4,10 @@ import java_cup.runtime.*;
 
 %cup
 %unicode
+%class Scanner
+%char
+%line
+%column
 
 IDENT                = [A-Za-z] [A-Za-z0-9]*
 DEC_LETT             = [0-9]+
@@ -15,11 +19,6 @@ SPACE                = [\ \t\f]
 COMMENT              = "//"{ALL_CHARS}*
 MULTILINE_ISTR       = {SPACE}? "&" {SPACE}? {COMMENT}? {CR}
 
-%class Scanner
-%char
-%line
-%column
-
 %{  //codice per associare la Symbol Factory
     ComplexSymbolFactory sf;
     
@@ -30,6 +29,7 @@ MULTILINE_ISTR       = {SPACE}? "&" {SPACE}? {COMMENT}? {CR}
 %}
 
 %%
+
 "+"                   {return sf.newSymbol("SUM", ParserSym.SUM);}
 "-"                   {return sf.newSymbol("SUB", ParserSym.SUB);}
 "*"                   {return sf.newSymbol("MUL", ParserSym.MUL);}

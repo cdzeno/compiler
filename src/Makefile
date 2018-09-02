@@ -15,7 +15,7 @@ lexer: expr.lex
 	$(JFLEX) expr.lex
 
 testLexer: $(SCANNER).java $(LEXER).java
-	$(JCC) -cp . $(LEXER).java 
+	$(JCC) $(CLASSPATH) $(LEXER).java 
 
 parser: expr.cup
 	java -jar $(CUP) expr.cup
