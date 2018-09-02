@@ -10,6 +10,6 @@ loop x * y
     1
    cont = cont 
    + 1
-end
+endLoop
 output cont
 newLine

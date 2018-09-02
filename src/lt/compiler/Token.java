@@ -1,6 +1,8 @@
 //tipo enumerativo e classe per rappresentare i Token
 
-class Token {
+package lt.compiler;
+
+public class Token {
 
   private TipoToken tipo;
   private Object valore;
