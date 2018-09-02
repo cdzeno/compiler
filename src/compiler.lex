@@ -46,7 +46,7 @@ SPACE                = [\ \t\f] | {ENDL}
 
 {LETTER}({LETTER}|{DEC_DIGIT})* { return new Token(IDENT, "IDENT"); }
 {DEC_DIGIT}+         { return new Token(DEC_NUM, "DEC_NUM"); }
-"0"[xX]{HEX_DIGIT}+     { return new Token(HEX_NUM, "HEX_NUM"); }
+"0"[xX]{HEX_DIGIT}+  { return new Token(HEX_NUM, "HEX_NUM"); }
 
 {ENDL}               { return new Token(ENDL, "ENDL"); }
 "\"" .* "\""         { return new Token(STRING, "STRING"); }
