@@ -36,7 +36,7 @@ SPACE                = [\ \t\f] | {ENDL}
 "("                  { return new Token(OPEN_PAR); }
 ")"                  { return new Token(CLOSED_PAR); }
 "?"                  { return new Token(QUESTION); }
-":"                  { return new Token(TWO_DOTS); }
+":"                  { return new Token(COLON); }
 
 "input"              { return new Token(INPUT); }
 "output"             { return new Token(OUTPUT); }
@@ -46,7 +46,7 @@ SPACE                = [\ \t\f] | {ENDL}
 
 {LETTER}({LETTER}|{DEC_DIGIT})* { return new Token(IDENT, yytext()); }
 {DEC_DIGIT}+         { return new Token(INTEGER, new Integer(yytext())); }
-"0x"{HEX_DIGIT}+  { return new Token(INTEGER, Integer.parseInt(yytext().substring(2), 16)); }
+"0x"{HEX_DIGIT}+     { return new Token(INTEGER, Integer.parseInt(yytext().substring(2), 16)); }
 
 {ENDL}               { return new Token(ENDL); }
 "\"" .* "\""         { return new Token(STRING, yytext().substring(1, yylength()-1)); }

@@ -8,16 +8,16 @@ action code {:
 	//SymbolTable symbolTable = new SymbolTable();
 :}
 
-terminal Integer		NUMBER;
-terminal String			IDENT;
-terminal String			STRING;
+terminal Integer	NUMBER;
+terminal String		IDENT;
+terminal String		STRING;
 
-terminal				ADD, SUB, MUL, DIV, MOD, EQU;
-terminal 				UNARY, OPEN_PAR, CLOSED_PAR;
-terminal 				QUESTION, TWO_DOTS;
-terminal 				INPUT, OUTPUT, NEWLINE;
-terminal				LOOP, ENDLOOP;
-terminal 				ENDL;
+terminal	ADD, SUB, MUL, DIV, MOD, EQU;
+terminal 	UNARY, OPEN_PAR, CLOSED_PAR;
+terminal 	QUESTION, COLON;
+terminal 	INPUT, OUTPUT, NEWLINE;
+terminal	LOOP, ENDLOOP;
+terminal 	ENDL;
 
 non terminal ListInstrWithTab	program;
 non terminal ListInstr			seqInstr;
@@ -71,7 +71,7 @@ expr		::=	NUMBER
 				%prec UNARY
 			  |	OPEN_PAR expr CLOSED_PAR
 			  |	IDENT EQU expr
-			  |	expr QUESTION expr TWO_DOTS expr
+			  |	expr QUESTION expr COLON expr
 			  |	INPUT
 			  |	INPUT STRING
 			;
