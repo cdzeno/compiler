@@ -12,17 +12,15 @@ LEXER = Lexer
 PARSER = Parser
 MAIN = Compiler
 EXAMPLES = tests/test_*.s
-
-all: lexer
 	
 lexer: src/compiler.lex
-	@[ -f $(SRC)/$(SCANNER).java ] && $(RM) -f $(SRC)/$(SCANNER).java
-	$(JFLEX) -d $(SRC) src/compiler.lex
+	@[ -f $(SRC)/$(SCANNER).java ] && $(RM) $(SRC)/$(SCANNER).java
+	$(JFLEX) $<
 
-testLexer: $(SRC)/$(SCANNER).java src/$(LEXER).java
+testLexer: src/$(LEXER).java $(SRC)/$(SCANNER).java
 	@echo "[*] Testing lexer:"
 	@[ -d $(OUT) ] || mkdir $(OUT)
-	$(JAVAC) $(CLASSPATH) -d $(OUT) src/$(LEXER).java
+	$(JAVAC) $(CLASSPATH) -d $(OUT) $<
 	@for f in $(EXAMPLES) ; do \
 		echo $$f ; \
 		$(JAVA) $(CLASSPATH) $(LEXER) < $$f ; \

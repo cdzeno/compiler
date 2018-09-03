@@ -27,37 +27,37 @@ SPACE                = [\ \t\f] | {ENDL}
 
 %%
 
-"+"                  { return new Token(ADD, "PIU"); }
-"-"                  { return new Token(SUB, "MENO"); }
-"*"                  { return new Token(MUL, "PER"); }
-"/"                  { return new Token(DIV, "DIV"); }
-"%"                  { return new Token(MOD, "MOD"); }
-"="                  { return new Token(EQU, "EQU"); }
-"("                  { return new Token(OPEN_PAR, "PAR_A"); }
-")"                  { return new Token(CLOSED_PAR, "PAR_C"); }
-"?"                  { return new Token(QUESTION, "DOMANDA"); }
-":"                  { return new Token(TWO_DOTS, "DUE_PUNTI"); }
+"+"                  { return new Token(ADD); }
+"-"                  { return new Token(SUB); }
+"*"                  { return new Token(MUL); }
+"/"                  { return new Token(DIV); }
+"%"                  { return new Token(MOD); }
+"="                  { return new Token(EQU); }
+"("                  { return new Token(OPEN_PAR); }
+")"                  { return new Token(CLOSED_PAR); }
+"?"                  { return new Token(QUESTION); }
+":"                  { return new Token(TWO_DOTS); }
 
-"input"              { return new Token(INPUT, "IN"); }
-"output"             { return new Token(OUTPUT, "OUT"); }
-"loop"               { return new Token(LOOP, "LOOP"); }
-"endLoop"            { return new Token(ENDLOOP, "ENDLOOP"); }
-"newLine"            { return new Token(NEWLINE, "NEWLINE"); }
+"input"              { return new Token(INPUT); }
+"output"             { return new Token(OUTPUT); }
+"loop"               { return new Token(LOOP); }
+"endLoop"            { return new Token(ENDLOOP); }
+"newLine"            { return new Token(NEWLINE); }
 
-{LETTER}({LETTER}|{DEC_DIGIT})* { return new Token(IDENT, "IDENT"); }
-{DEC_DIGIT}+         { return new Token(DEC_NUM, "DEC_NUM"); }
-"0"[xX]{HEX_DIGIT}+  { return new Token(HEX_NUM, "HEX_NUM"); }
+{LETTER}({LETTER}|{DEC_DIGIT})* { return new Token(IDENT, yytext()); }
+{DEC_DIGIT}+         { return new Token(INTEGER, new Integer(yytext())); }
+"0"[xX]{HEX_DIGIT}+  { return new Token(INTEGER, Integer.parseInt(yytext().substring(2), 16)); }
 
-{ENDL}               { return new Token(ENDL, "ENDL"); }
-"\"" .* "\""         { return new Token(STRING, "STRING"); }
+{ENDL}               { return new Token(ENDL); }
+"\"" .* "\""         { return new Token(STRING, yytext().substring(1, yylength()-1)); }
 
 "&"                  { yybegin(MULTILINE); }
 <MULTILINE> {ENDL}   { yybegin(YYINITIAL); }
 
-"//" .*              { return new Token(COMMENT, "COMMENT"); }
+"//" .*              { return new Token(COMMENT, yytext()); }
 <MULTILINE> "//" .*  { }
 <YYINITIAL, MULTILINE> {SPACE} { }
 
-.                    { return new Token(ERROR, "ERR"); }
+.                    { return new Token(ERROR, yytext()); }
 
-<<EOF>>              { return new Token(EOF, "EOF"); }
+<<EOF>>              { return new Token(EOF); }

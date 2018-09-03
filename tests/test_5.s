@@ -9,7 +9,7 @@ loop x * y
 	y = y - & 
     1
    cont = cont & 
-   + 1
+   + 0xF
 endLoop
 output cont
 newLine
