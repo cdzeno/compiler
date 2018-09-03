@@ -1,131 +1,78 @@
+package lt.compiler;
 
 import java_cup.runtime.*;
 
 class Parser;
 
 action code {:
-  SymbolTable symbolTable = new SymbolTable();
+	//SymbolTable symbolTable = new SymbolTable();
 :}
 
-terminal Integer		LETT;
+terminal Integer		NUMBER;
 terminal String			IDENT;
 terminal String			STRING;
 
-terminal 				SUM, SUB, MUL, DIV, MOD, EQU;
-terminal 				TONDA_A, TONDA_C;
-terminal 				PUNTO_INT, DUE_PUNTI;
-terminal 				INPUT, OUTPUT, LOOP, ENDLOOP, NEWLINE;		
-terminal 				CR, EOF, ERROR, UNARIO;
+terminal				ADD, SUB, MUL, DIV, MOD, EQU;
+terminal 				UNARY, OPEN_PAR, CLOSED_PAR;
+terminal 				QUESTION, TWO_DOTS;
+terminal 				INPUT, OUTPUT, NEWLINE;
+terminal				LOOP, ENDLOOP;
+terminal 				ENDL;
 
-non terminal ListExprConTab program
-non terminal ListExpr 		seqIstr
-non terminal Expr 			istr
-non terminal Expr 			assign
-non terminal Expr 			write
-non terminal Expr 			cycle
-non terminal Expr 			expr
+non terminal ListInstrWithTab	program;
+non terminal ListInstr			seqInstr;
+non terminal Instr				instr;
+non terminal Instr				assign;
+non terminal Instr				write;
+non terminal Instr				loopCycle;
+non terminal Expr				expr;
 
-precedence left EQU;
-precedence left SUM, SUB;
+precedence right EQU;
+precedence left ADD, SUB;
 precedence left MUL, DIV, MOD;
-precedence nonassoc UNARIO;
+precedence nonassoc UNARY;
 
 start with program;
 
-program ::=		seqIstr:l
-				{: RESULT = new ListExprConTab(l, symbolTable) :}
-		;
+program		::=	seqInstr
+			;
 
-seqIstr	::=		istr:i CR 
-				{: RESULT = new ListExpr(i); :}
-			|
-				seqIstr:s istr:i CR
-				{: RESULT = s.append(i); :}
-		;
+seqInstr	::=	instr ENDL
+			  |	seqInstr instr ENDL
+			;
 
-istr 	::=		assign:a
-				{: RESULT = a:}
-			|
-				write:w
-				{: RESULT = w:}
-			|
-				cycle:c
-				{: RESULT = c:}
-		;
+instr		::=	assign
+			  |	write
+			  |	loopCycle
+			;
 
-assign	::=		IDENT:id EQU expr:e
-				{: 	
-					Descrittore d = symbolTable.trovaEAggiungi(id);
-					RESULT = new Assign(d, e); 
-				:}
-		;
+assign		::=	IDENT EQU expr
+			;
 
-write 	::= 	OUTPUT STRING expr:e
-				{: RESULT = new Write(STRING, e); :}
-			|
-				OUTPUT STRING
-				{: RESULT = new Write(STRING); :}
-			|
-				OUTPUT expr:e
-				{: RESULT = new Write(e); :}
-			|	
-				NEWLINE
-				{: RESULT = new Write("\n"); :}
-		;
+write		::=	OUTPUT STRING expr
+			  |	OUTPUT STRING
+			  |	OUTPUT expr
+			  |	NEWLINE
+			;
 
-cycle	::=		LOOP expr:e CR seqIstr:seq ENDLOOP
-				{: RESULT = new Cycle(e, seq); :}
-		;
+loopCycle	::=	LOOP expr ENDL seqInstr ENDLOOP
+			;
 
-expr	::=		LETT:num
-				{: RESULT = new NumExpr(num); :}
-			|
-				IDENT:id
-				{: 
-				   Descrittore d = symbolTable.trovaEAggiungi(id);
-                   RESULT = new IdExpr(d); 
-				:}
-			|
-				expr:e1 SUM expr:e2
-				{: RESULT = new SumExpr(e1, e2); :}
-			|
-				expr:e1 SUB expr:e2
-				{: RESULT = new SubExpr(e1, e2); :}
-			|
-				expr:e1 MUL expr:e2
-				{: RESULT = new MulExpr(e1, e2); :}
-			|
-				expr:e1 DIV expr:e2
-				{: RESULT = new DivExpr(e1, e2); :}
-			|
-				expr:e1 MOD expr:e2
-				{: RESULT = new ModExpr(e1, e2); :}
-			|
-				SUB expr:e
-				{: RESULT = new MinusExpr(e); :}
-				%prec UNARIO
-			|
-				SUM expr:e
-				{: RESULT = new PlusExpr(e); :}
-				%prec UNARIO
-			|
-				TONDA_A expr:e TONDA_C
-				{: RESULT = e:}
-			|
-				IDENT:id EQU expr:e
-				{: 
-					Descrittore d = symbolTable.trovaEAggiungi(id);
-					RESULT = new Assign(d, e);
-				 :}
-			|
-				expr:e1 PUNTO_INT expr:e2 DUE_PUNTI expr:e3
-				{: RESULT = new TernaryExpr(e1, e2, e3); :}
-			|
-				INPUT
-				{: RESULT = new InputExpr():}
-			|
-				INPUT STRING
-				{: RESULT = new InputExpr(STRING); :}
-		;
+expr		::=	NUMBER
+			  |	IDENT
+			  |	expr ADD expr
+			  |	expr SUB expr
+			  |	expr MUL expr
+			  |	expr DIV expr
+			  |	expr MOD expr
+			  |	SUB expr
+				%prec UNARY
+			  |	ADD expr
+				%prec UNARY
+			  |	OPEN_PAR expr CLOSED_PAR
+			  |	IDENT EQU expr
+			  |	expr QUESTION expr TWO_DOTS expr
+			  |	INPUT
+			  |	INPUT STRING
+			;
 
-			

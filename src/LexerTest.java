@@ -1,7 +1,7 @@
 import java.io.*;
 import lt.compiler.*;
 
-class Lexer {
+class LexerTest {
     public static void main(String args[]) throws IOException {
       Scanner scanner = new Scanner(new InputStreamReader(System.in));
       Token t;

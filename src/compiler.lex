@@ -46,7 +46,7 @@ SPACE                = [\ \t\f] | {ENDL}
 
 {LETTER}({LETTER}|{DEC_DIGIT})* { return new Token(IDENT, yytext()); }
 {DEC_DIGIT}+         { return new Token(INTEGER, new Integer(yytext())); }
-"0"[xX]{HEX_DIGIT}+  { return new Token(INTEGER, Integer.parseInt(yytext().substring(2), 16)); }
+"0x"{HEX_DIGIT}+  { return new Token(INTEGER, Integer.parseInt(yytext().substring(2), 16)); }
 
 {ENDL}               { return new Token(ENDL); }
 "\"" .* "\""         { return new Token(STRING, yytext().substring(1, yylength()-1)); }
@@ -54,7 +54,7 @@ SPACE                = [\ \t\f] | {ENDL}
 "&"                  { yybegin(MULTILINE); }
 <MULTILINE> {ENDL}   { yybegin(YYINITIAL); }
 
-"//" .*              { return new Token(COMMENT, yytext()); }
+"//" .*              { }
 <MULTILINE> "//" .*  { }
 <YYINITIAL, MULTILINE> {SPACE} { }
 
