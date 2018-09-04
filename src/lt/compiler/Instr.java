@@ -17,7 +17,8 @@ class AssignInstr implements Instr {
 	}
 
 	public void generateCode(Codice c) {
-		//TODO
+		expr.generateCode(c);
+		c.genera(POP, descriptor.getAddress());
 	}
 
 	public String toString() {

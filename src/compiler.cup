@@ -75,7 +75,7 @@ loop	::=	LOOP expr:cond ENDL instrSeq:body ENDLOOP
 expr		::=	NUMBER:n
 				{: RESULT = new NumberExpr(n); :}
 			  |	IDENT:id
-				{: Descriptor d = symbolTable.find(id);
+				{: Descriptor d = symbolTable.findInsert(id);
 				   RESULT = new IdExpr(d); :}
 			  |	expr:e1 ADD expr:e2
 				{: RESULT = new AddExpr(e1, e2); :}

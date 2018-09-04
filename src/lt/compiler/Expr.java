@@ -31,7 +31,7 @@ class IdExpr implements Expr {
 	}
 
 	public void generateCode(Codice c) {
-		//TODO
+		c.genera(PUSH, descriptor.getAddress());
 	}
 
 	public String toString() {
@@ -177,7 +177,8 @@ class AssignExpr implements Expr {
 	}
 
 	public void generateCode(Codice c) {
-		//TODO
+		new AssignInstr(descriptor, expr).generateCode(c);
+		new IdExpr(descriptor).generateCode(c);
 	}
 
 	public String toString() {
