@@ -73,7 +73,14 @@ class LoopInstr implements Instr {
 	}
 
 	public void generateCode(Codice c) {
-		//TODO
+		int begin = c.indirizzoProssimaIstruzione();
+		cond.generateCode(c);
+		int jumpEnd = c.generaParziale(JZERO);
+
+		body.generateCode(c);
+		c.genera(JUMP, begin);
+
+		c.completaIstruzione(jumpEnd, c.indirizzoProssimaIstruzione());
 	}
 
 	public String toString() {
