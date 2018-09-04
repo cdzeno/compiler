@@ -226,6 +226,7 @@ class InputExpr implements Expr {
 	}
 
 	public void generateCode(Codice c) {
+		new OutputInstr(prompt).generateCode(c);
 		c.genera(INPUT);
 	}
 
