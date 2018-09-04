@@ -1,45 +1,43 @@
-/* Un oggetto di questa classe e' una symbol table */
+package lt.compiler;
 
 import java.util.Vector;
 import java.util.Iterator;
 
-public class SymbolTable implements Iterable<Descrittore> {
+public class SymbolTable implements Iterable<Descriptor> {
 
-  private Vector<Descrittore> tabella; //implementazione basata su Vector
+	private Vector<Descriptor> table;
 
-  /* Costruisce tabella vuota */
-  public SymbolTable() {
-    tabella = new Vector<Descrittore>();
-  }
+	public SymbolTable() {
+		table = new Vector<Descriptor>();
+	}
 
-  /* Cerca il descrittore di una stringa nella tabella,
-     se non c'e' restituisce null */
-  public Descrittore trova(String s) {
-    int posizione = tabella.indexOf(new Descrittore(s));
-    if (posizione == -1)
-      return null;
-    else
-      return tabella.elementAt(posizione);
-  }
+	/* Cerca il descrittore di una stringa nella tabella,
+		 se non c'e' restituisce null */
+	public Descriptor find(String s) {
+		int pos = table.indexOf(new Descriptor(s));
+		if (pos == -1)
+			return null;
+		return table.elementAt(pos);
+	}
 
-  /* Aggiunge un descrittore alla tabella */
-  public void aggiungi(Descrittore d) {
-    tabella.add(d);
-  }
+	/* Aggiunge un descrittore alla tabella */
+	public void insert(Descriptor d) {
+		table.add(d);
+	}
 
-  /* Cerca il descrittore di una stringa nella tabella,
-     se non c'e' lo aggiunge */
-  public Descrittore trovaEAggiungi(String s) {
-    Descrittore d = this.trova(s);
-    if (d == null) {
-      d = new Descrittore(s);
-      this.aggiungi(d);
-    }
-    return d;
-  }
-  
-  public Iterator<Descrittore> iterator() {
-    return tabella.iterator();
-  }
+	/* Cerca il descrittore di una stringa nella tabella,
+		 se non c'e' lo aggiunge */
+	public Descriptor findInsert(String s) {
+		Descriptor d = find(s);
+		if (d == null) {
+			d = new Descriptor(s);
+			insert(d);
+		}
+		return d;
+	}
+	
+	public Iterator<Descriptor> iterator() {
+		return table.iterator();
+	}
 
 }

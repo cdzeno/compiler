@@ -1,268 +1,236 @@
-/* La classe astratta Expr definisce parse tree per le espressioni.
-   Le sottoclassi concrete si riferiscono ai tipi particolari di
-   espressioni.
-   Il metodo generaCodice permette di generare il codice per calcolare
-   l'espressione.
-*/
+package lt.compiler;
 
-import lt.macchina.Codice;
+import lt.macchina.*;
 import static lt.macchina.Macchina.*;
 
-abstract class Expr {
-
-  public abstract void generaCodice(Codice c);
-
+interface Expr {
+	void generateCode(Codice c);
 }
 
-class Assign extends Expr {
+class NumberExpr implements Expr {
+	private Integer num;
 
-  private Descrittore v;
-  private Expr e;
+	public NumberExpr(Integer num) {
+		this.num = num;
+	}
 
-  public Assign (Descrittore desc, Expr expr){
-    this.v = desc;
-    this.e = expr;
-  }
-  
-  void generaCodice(Codice c){
+	public void generateCode(Codice c) {
+		c.genera(PUSHIMM, num.intValue());
+	}
 
-  }
+	public String toString() {
+		return num.toString();
+	}
 }
 
-class Write extends Expr {
+class IdExpr implements Expr {
+	private Descriptor descriptor;
 
-  private String output;
-  private Expr expr;
+	public IdExpr(Descriptor d) {
+		descriptor = d;
+	}
 
-  public Write (String s, Expr e){
-    this.output = s;
-    this.expr = e;
-  }
+	public void generateCode(Codice c) {
+		//TODO
+	}
 
-  public Write (String s){
-    this.output = s;
-  }
-
-  public Write (Expr e){
-    this.expr = e;
-  }
-  
-  void generaCodice(Codice c){
-
-  }
+	public String toString() {
+		return descriptor.getIdentifier();
+	}
 }
 
-class Cycle extends Expr {
+class AddExpr implements Expr {
+	private Expr leftExpr;
+	private Expr rightExpr;
 
-  private Expr cond;
-  private ListExpr seq;
+	public AddExpr(Expr left, Expr right) {
+		leftExpr = left;
+		rightExpr = right;
+	}
 
-  public Cycle (Expr expr, ListExpr seq){
-    this.cond = expr;
-    this.seq = seq;  
-  }
-  
-  void generaCodice(Codice c){
+	public void generateCode(Codice c) {
+		leftExpr.generateCode(c);
+		rightExpr.generateCode(c);
+		c.genera(ADD);
+	}
 
-  }
+	public String toString() {
+		return leftExpr.toString() + " + " + rightExpr.toString();
+	}
 }
 
-class NumExpr extends Expr {
-  private Integer num;
+class SubExpr implements Expr {
+	private Expr leftExpr;
+	private Expr rightExpr;
 
-  public NumExpr(Integer num) {
-    this.num = num;
-  }
+	public SubExpr(Expr left, Expr right) {
+		leftExpr = left;
+		rightExpr = right;
+	}
 
-  public void generaCodice(Codice c) {
-    c.genera(PUSHIMM, num.intValue());
-  }
-  
-  public String toString() {
-    return num.toString();
-  }
+	public void generateCode(Codice c) {
+		leftExpr.generateCode(c);
+		rightExpr.generateCode(c);
+		c.genera(SUB);
+	}
+
+	public String toString() {
+		return leftExpr.toString() + " - " + rightExpr.toString();
+	}
 }
 
-class IdExpr extends Expr {
-  private Descrittore descrittore;
+class MulExpr implements Expr {
+	private Expr leftExpr;
+	private Expr rightExpr;
 
-  public IdExpr(Descrittore d) {
-    descrittore = d;
-  }
+	public MulExpr(Expr left, Expr right) {
+		leftExpr = left;
+		rightExpr = right;
+	}
 
-  public void generaCodice(Codice c) {
-    c.genera(PUSH, descrittore.getIndirizzo());
-  }
+	public void generateCode(Codice c) {
+		leftExpr.generateCode(c);
+		rightExpr.generateCode(c);
+		c.genera(MUL);
+	}
 
-  public String toString() {
-    return descrittore.getIdentificatore();
-  }
+	public String toString() {
+		return leftExpr.toString() + " * " + rightExpr.toString();
+	}
 }
 
+class DivExpr implements Expr {
+	private Expr leftExpr;
+	private Expr rightExpr;
 
-class SumExpr extends Expr {
-  private Expr sx, dx;
+	public DivExpr(Expr left, Expr right) {
+		leftExpr = left;
+		rightExpr = right;
+	}
 
-  public PiuExpr(Expr sx, Expr dx) {
-    this.sx = sx;
-    this.dx = dx;
-  }
+	public void generateCode(Codice c) {
+		leftExpr.generateCode(c);
+		rightExpr.generateCode(c);
+		c.genera(DIV);
+	}
 
-  public void generaCodice(Codice c) {
-    sx.generaCodice(c);
-    dx.generaCodice(c);
-    c.genera(ADD);
-  }
-
-  public String toString() {
-    return sx.toString() + " " + dx.toString() + " +";
-  }
+	public String toString() {
+		return leftExpr.toString() + " / " + rightExpr.toString();
+	}
 }
 
+class ModExpr implements Expr {
+	private Expr leftExpr;
+	private Expr rightExpr;
 
-class SubExpr extends Expr {
-  private Expr sx, dx;
+	public ModExpr(Expr left, Expr right) {
+		leftExpr = left;
+		rightExpr = right;
+	}
 
-  public MenoExpr(Expr sx, Expr dx) {
-    this.sx = sx;
-    this.dx = dx;
-  }
+	public void generateCode(Codice c) {
+		leftExpr.generateCode(c);
+		rightExpr.generateCode(c);
+		c.genera(POP, 1);
+		c.genera(POP, 0);
 
-  public void generaCodice(Codice c) {
-    sx.generaCodice(c);
-    dx.generaCodice(c);
-    c.genera(SUB);
-  }
+		c.genera(PUSH, 0);
+		c.genera(PUSH, 1);
+		c.genera(PUSH, 0);
+		c.genera(PUSH, 1);
 
-  public String toString() {
-    return sx.toString() + " " + dx.toString() + " -";
-  }
+		c.genera(DIV);
+		c.genera(MUL);
+		c.genera(SUB);
+	}
+
+	public String toString() {
+		return leftExpr.toString() + " % " + rightExpr.toString();
+	}
 }
 
+class UnaryMinusExpr implements Expr {
+	private Expr expr;
 
-class MulExpr extends Expr {
-  private Expr sx, dx;
+	public UnaryMinusExpr(Expr e) {
+		expr = e;
+	}
 
-  public PerExpr(Expr sx, Expr dx) {
-    this.sx = sx;
-    this.dx = dx;
-  }
+	public void generateCode(Codice c) {
+		c.genera(PUSHIMM, 0);
+		expr.generateCode(c);
+		c.genera(SUB);
+	}
 
-  public void generaCodice(Codice c) {
-    sx.generaCodice(c);
-    dx.generaCodice(c);
-    c.genera(MUL);
-  }
-
-  public String toString() {
-    return sx.toString() + " " + dx.toString() + " *";
-  }
+	public String toString() {
+		return  "-" + expr.toString();
+	}
 }
 
+class AssignExpr implements Expr {
+	private Descriptor descriptor;
+	private Expr expr;
 
-class DivExpr extends Expr {
-  private Expr sx, dx;
+	public AssignExpr(Descriptor d, Expr e) {
+		descriptor = d;
+		expr = e;
+	}
 
-  public DivisoExpr(Expr sx, Expr dx) {
-    this.sx = sx;
-    this.dx = dx;
-  }
+	public void generateCode(Codice c) {
+		//TODO
+	}
 
-  public void generaCodice(Codice c) {
-    sx.generaCodice(c);
-    dx.generaCodice(c);
-    c.genera(DIV);
-  }
-
-  public String toString() {
-    return sx.toString() + " " + dx.toString() + " /";
-  }
+	public String toString() {
+		return descriptor.getIdentifier() + " = " + expr.toString();
+	}
 }
 
-class ModExpr extends Expr {
-  private Expr sx, dx;
+class TernaryExpr implements Expr {
+	private Expr condition;
+	private Expr trueExpr;
+	private Expr falseExpr;
 
-  public DivisoExpr(Expr sx, Expr dx) {
-    this.sx = sx;
-    this.dx = dx;
-  }
+	public TernaryExpr(Expr c, Expr t, Expr f) {
+		condition = c;
+		trueExpr = t;
+		falseExpr = f;
+	}
 
-  public void generaCodice(Codice c) {
-    sx.generaCodice(c);
-    dx.generaCodice(c);
-    //c.genera(DIV);
-  }
+	public void generateCode(Codice c) {
+		condition.generateCode(c);
+		int jumpFalse = c.generaParziale(JZERO);
 
-  public String toString() {
-    return sx.toString() + " " + dx.toString() + " /";
-  }
+		trueExpr.generateCode(c);
+		int jumpEnd = c.generaParziale(JUMP);
+
+		c.completaIstruzione(jumpFalse, c.indirizzoProssimaIstruzione());
+		falseExpr.generateCode(c);
+
+		c.completaIstruzione(jumpEnd, c.indirizzoProssimaIstruzione());
+	}
+
+	public String toString() {
+		return condition.toString() + " ? " + trueExpr.toString() + " : " + falseExpr.toString();
+	}
 }
 
+class InputExpr implements Expr {
+	private String prompt;
 
-class MinusExpr extends Expr {
-  private Expr e;
+	public InputExpr(String p) {
+		prompt = p;
+	}
 
-  public MinusExpr(Expr e) {
-    this.e = e;
-  }
+	public InputExpr() {
+		this("");
+	}
 
-  public void generaCodice(Codice c) {
-    c.genera(PUSHIMM, 0);
-    e.generaCodice(c);
-    c.genera(SUB);
-  }
+	public void generateCode(Codice c) {
+		c.genera(INPUT);
+	}
 
-  public String toString() {
-    return e.toString() + "-";
-  }
+	public String toString() {
+		return "input \"" + prompt + "\"";
+	}
 }
 
-
-class PlusExpr extends Expr {
-  private Expr e;
-
-  public PlusExpr(Expr e) {
-    this.e = e;
-  }
-
-  public void generaCodice(Codice c) {
-    e.generaCodice(c);
-  }
-
-  public String toString() {
-    return e.toString() + "+";
-  }
-}
-
-class TernaryExpr extends Expr {
-
-  private Expr condition;
-  private Expr first;
-  private Expr second;
-
-  public TernaryExpr(Expr cond, Expr f, Expr s){
-    this.condition = cond;
-    this.first = f;
-    this.second = s;
-  }
-
-  public void generaCodice(Codice c){
-
-  }
-}
-
-class InputExpr extends Expr {
-  private String message;
-
-  public InputExpr(){
-
-  }
-
-  public InputExpr(String s){
-    this.message = s;
-  }
-
-  public void generaCodice(Codice c){
-    
-  }
-}

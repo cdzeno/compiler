@@ -1,63 +1,66 @@
-// import java_cup.runtime.*;
-
 package lt.compiler;
 
-import static lt.compiler.TipoToken.*;
+import java_cup.runtime.*;
 
 %%
 
-// %cup
 %unicode
+
+%cup
 %class Scanner
-%function getNext
-%type Token
 %public
 
 %char
 %line
-%column
 
-LETTER               = [:letter:]
-DEC_DIGIT            = [:digit:]
-HEX_DIGIT            = [a-fA-F] | {DEC_DIGIT}
-ENDL                 = \r | \n | \r\n
-SPACE                = [\ \t\f] | {ENDL}
+%{
+    ComplexSymbolFactory sf;
+    public Scanner(java.io.Reader in, ComplexSymbolFactory sf) {
+        this(in);
+        this.sf = sf;
+    }
+%}
 
-%xstate MULTILINE
+LETTER              = [:letter:]
+DEC_DIGIT           = [:digit:]
+HEX_DIGIT           = [a-fA-F] | {DEC_DIGIT}
+ENDL                = \r | \n | \r\n
+SPACE				= [\ \t\f] | {ENDL}
+STRING_LIT			= "\"" ("\\\""|[^\n\r\"])* "\""
+COMMENT				= "//" .*
 
 %%
 
-"+"                  { return new Token(ADD); }
-"-"                  { return new Token(SUB); }
-"*"                  { return new Token(MUL); }
-"/"                  { return new Token(DIV); }
-"%"                  { return new Token(MOD); }
-"="                  { return new Token(EQU); }
-"("                  { return new Token(OPEN_PAR); }
-")"                  { return new Token(CLOSED_PAR); }
-"?"                  { return new Token(QUESTION); }
-":"                  { return new Token(COLON); }
+"+"                  { return sf.newSymbol("ADD", ParserSym.ADD); }
+"-"                  { return sf.newSymbol("SUB", ParserSym.SUB); }
+"*"                  { return sf.newSymbol("MUL", ParserSym.MUL); }
+"/"                  { return sf.newSymbol("DIV", ParserSym.DIV); }
+"%"                  { return sf.newSymbol("MOD", ParserSym.MOD); }
+"="                  { return sf.newSymbol("EQU", ParserSym.EQU); }
+"("                  { return sf.newSymbol("OPEN_PAR", ParserSym.OPEN_PAR); }
+")"                  { return sf.newSymbol("CLOSED_PAR", ParserSym.CLOSED_PAR); }
+"?"                  { return sf.newSymbol("QUESTION", ParserSym.QUESTION); }
+":"                  { return sf.newSymbol("COLON", ParserSym.COLON); }
 
-"input"              { return new Token(INPUT); }
-"output"             { return new Token(OUTPUT); }
-"loop"               { return new Token(LOOP); }
-"endLoop"            { return new Token(ENDLOOP); }
-"newLine"            { return new Token(NEWLINE); }
+"input"              { return sf.newSymbol("INPUT", ParserSym.INPUT); }
+"output"             { return sf.newSymbol("OUTPUT", ParserSym.OUTPUT); }
+"loop"               { return sf.newSymbol("LOOP", ParserSym.LOOP); }
+"endLoop"            { return sf.newSymbol("ENDLOOP", ParserSym.ENDLOOP); }
+"newLine"            { return sf.newSymbol("NEWLINE", ParserSym.NEWLINE); }
 
-{LETTER}({LETTER}|{DEC_DIGIT})* { return new Token(IDENT, yytext()); }
-{DEC_DIGIT}+         { return new Token(INTEGER, new Integer(yytext())); }
-"0x"{HEX_DIGIT}+     { return new Token(INTEGER, Integer.parseInt(yytext().substring(2), 16)); }
+{LETTER}({LETTER}|{DEC_DIGIT})* { return sf.newSymbol("IDENT", ParserSym.IDENT, yytext()); }
+{DEC_DIGIT}+         { return sf.newSymbol("NUMBER", ParserSym.NUMBER, new Integer(yytext())); }
+"0x"{HEX_DIGIT}+     { return sf.newSymbol("NUMBER", ParserSym.NUMBER, Integer.parseInt(yytext().substring(2), 16)); }
 
-{ENDL}               { return new Token(ENDL); }
-"\"" .* "\""         { return new Token(STRING, yytext().substring(1, yylength()-1)); }
+{STRING_LIT}         { return sf.newSymbol("STRING", ParserSym.STRING, yytext().substring(1, yylength()-1)); }
 
-"&"                  { yybegin(MULTILINE); }
-<MULTILINE> {ENDL}   { yybegin(YYINITIAL); }
+{COMMENT}            { }
+"&" ({COMMENT}|{SPACE})* {ENDL} { }
 
-"//" .*              { }
-<MULTILINE> "//" .*  { }
-<YYINITIAL, MULTILINE> {SPACE} { }
+^{COMMENT}{ENDL}     { }
+^{ENDL}              { }
+{ENDL}               { return sf.newSymbol("ENDL", ParserSym.ENDL); }
 
-.                    { return new Token(ERROR, yytext()); }
-
-<<EOF>>              { return new Token(EOF); }
+{SPACE} { }
+.                    { return sf.newSymbol("ERROR", ParserSym.error); }
+<<EOF>>              { return sf.newSymbol("EOF", ParserSym.EOF); }

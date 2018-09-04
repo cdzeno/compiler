@@ -5,7 +5,7 @@ import java_cup.runtime.*;
 class Parser;
 
 action code {:
-	//SymbolTable symbolTable = new SymbolTable();
+	SymbolTable symbolTable = new SymbolTable();
 :}
 
 terminal Integer	NUMBER;
@@ -19,60 +19,90 @@ terminal 	INPUT, OUTPUT, NEWLINE;
 terminal	LOOP, ENDLOOP;
 terminal 	ENDL;
 
-non terminal ListInstrWithTab	program;
-non terminal ListInstr			seqInstr;
-non terminal Instr				instr;
-non terminal Instr				assign;
-non terminal Instr				write;
-non terminal Instr				loopCycle;
-non terminal Expr				expr;
+non terminal Program	program;
+non terminal InstrSeq	instrSeq;
+non terminal Instr		instr;
+non terminal Instr		assign;
+non terminal Instr		write;
+non terminal Instr		loop;
+non terminal Expr		expr;
 
 precedence right EQU;
+precedence right QUESTION;
 precedence left ADD, SUB;
 precedence left MUL, DIV, MOD;
 precedence nonassoc UNARY;
 
 start with program;
 
-program		::=	seqInstr
+program		::=	instrSeq:s
+				{: RESULT = new Program(s, symbolTable); :}
 			;
 
-seqInstr	::=	instr ENDL
-			  |	seqInstr instr ENDL
+instrSeq	::=	instr:i ENDL
+				{: RESULT = new InstrSeq(i); :}
+			  |	instrSeq:s instr:i ENDL
+				{: RESULT = new InstrSeq(s, i); :}
 			;
 
-instr		::=	assign
-			  |	write
-			  |	loopCycle
+instr		::=	assign:a
+				{: RESULT = a; :}
+			  |	write:w
+				{: RESULT = w; :}
+			  |	loop:l
+				{: RESULT = l; :}
 			;
 
-assign		::=	IDENT EQU expr
+assign		::=	IDENT:id EQU expr:e
+				{: Descriptor d = symbolTable.findInsert(id);
+				   RESULT = new AssignInstr(d, e); :}
 			;
 
-write		::=	OUTPUT STRING expr
-			  |	OUTPUT STRING
-			  |	OUTPUT expr
+write		::=	OUTPUT STRING:s expr:e
+				{: RESULT = new OutputInstr(s, e); :}
+			  |	OUTPUT STRING:s
+				{: RESULT = new OutputInstr(s); :}
+			  |	OUTPUT expr:e
+				{: RESULT = new OutputInstr(e); :}
 			  |	NEWLINE
+				{: RESULT = new OutputInstr("\n"); :}
 			;
 
-loopCycle	::=	LOOP expr ENDL seqInstr ENDLOOP
+loop	::=	LOOP expr:cond ENDL instrSeq:body ENDLOOP
+				{: RESULT = new LoopInstr(cond, body); :}
 			;
 
-expr		::=	NUMBER
-			  |	IDENT
-			  |	expr ADD expr
-			  |	expr SUB expr
-			  |	expr MUL expr
-			  |	expr DIV expr
-			  |	expr MOD expr
-			  |	SUB expr
+expr		::=	NUMBER:n
+				{: RESULT = new NumberExpr(n); :}
+			  |	IDENT:id
+				{: Descriptor d = symbolTable.find(id);
+				   RESULT = new IdExpr(d); :}
+			  |	expr:e1 ADD expr:e2
+				{: RESULT = new AddExpr(e1, e2); :}
+			  |	expr:e1 SUB expr:e2
+				{: RESULT = new SubExpr(e1, e2); :}
+			  |	expr:e1 MUL expr:e2
+				{: RESULT = new MulExpr(e1, e2); :}
+			  |	expr:e1 DIV expr:e2
+				{: RESULT = new DivExpr(e1, e2); :}
+			  |	expr:e1 MOD expr:e2
+				{: RESULT = new ModExpr(e1, e2); :}
+			  |	SUB expr:e
+				{: RESULT = new UnaryMinusExpr(e); :}
 				%prec UNARY
-			  |	ADD expr
+			  |	ADD expr:e
+				{: RESULT = e; /*new UnaryPlusExpr(e);*/ :}
 				%prec UNARY
-			  |	OPEN_PAR expr CLOSED_PAR
-			  |	IDENT EQU expr
-			  |	expr QUESTION expr COLON expr
+			  |	OPEN_PAR expr:e CLOSED_PAR
+				{: RESULT = e; :}
+			  |	IDENT:id EQU expr:e
+				{: Descriptor d = symbolTable.findInsert(id);
+				   RESULT = new AssignExpr(d, e); :}
+			  |	expr:cond QUESTION expr:e1 COLON expr:e2
+				{: RESULT = new TernaryExpr(cond, e1, e2); :}
 			  |	INPUT
-			  |	INPUT STRING
+				{: RESULT = new InputExpr(); :}
+			  |	INPUT STRING:prompt
+				{: RESULT = new InputExpr(prompt); :}
 			;
 
