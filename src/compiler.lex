@@ -21,6 +21,12 @@ import java_cup.runtime.*;
     }
 %}
 
+%{
+	public int currentLineNumber() {
+		return yyline + 1;
+	}
+%}
+
 LETTER              = [:letter:]
 DEC_DIGIT           = [:digit:]
 HEX_DIGIT           = [a-fA-F] | {DEC_DIGIT}

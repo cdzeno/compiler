@@ -1,2 +1,2 @@
 #!/bin/sh
-java -cp "src/:bin/:lib/java-cup-11b-runtime.jar:lib/ltMacchina.jar" lt.compiler.Compiler $1
+java -cp "src/:bin/:lib/java-cup-11b-runtime.jar:lib/ltMacchina.jar" lt.compiler.Compiler $1 $2

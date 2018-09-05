@@ -8,25 +8,52 @@ import lt.macchina.*;
 import static lt.macchina.Macchina.*;
 
 public class Compiler {
-	public static void main(String[] args) throws java.io.IOException {
-		if (args.length < 1) {
-			System.err.println("usage: Compiler <source-name>");
+
+	public static boolean checkResult(Symbol result){
+
+		if (result.value instanceof Program){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public static void main(String[] args) {
+		if (args.length != 2) {
+			System.err.println("usage: java Compiler <source-name> <output-name>");
 			return;
 		}
 
-		BufferedReader in = new BufferedReader(new FileReader(args[0]));
+		System.out.println("[+] Starting compiling " + args[0]);
+		BufferedReader in;
 
+		try{
+			in = new BufferedReader(new FileReader(args[0]));
+		}catch (FileNotFoundException e) {
+			System.err.println("[-] Error during reading " + args[0]);
+			return;
+		}
+		
 		ComplexSymbolFactory sf = new ComplexSymbolFactory();
 		Scanner scanner = new Scanner(in, sf);
 		Parser parser = new Parser(scanner, sf);
+		Symbol result;
 
-		try {
-			Symbol result = parser.parse();
+		try{
+			result = parser.parse();
+		}catch(Exception e){
+			return;
+		}
+		
+		if (checkResult(result)){
+			System.out.println("[+] Parsing ends without error");
+			
 			Program program = (Program) result.value;
 			InstrSeq instructions = program.getInstructions();
-
 			SymbolTable symbolTable = program.getSymbolTable();
-			Codice code = new Codice("eseguibile");
+
+			System.out.print("[+] Generating code");
+			Codice code = new Codice(args[1]);
 
 			// Reserve space for MOD registers (0-1) and variables (2...)
 			Random rand = new Random();
@@ -43,9 +70,18 @@ public class Compiler {
 			instructions.generateCode(code);
 
 			code.genera(HALT);
-			code.fineCodice();
-		} catch (Exception e)	{
-			e.printStackTrace();
+
+			try{
+				code.fineCodice();
+			}catch (IOException e) {
+				System.err.println("...ERROR");
+				return;
+			}
+
+			System.out.println("...DONE");
+			System.out.println("[+] End of compilation, everything goes well.");
+		}else{
+			System.err.println("[-] Error during compilation...");
 		}
 	}
 }

@@ -11,7 +11,7 @@ LEXER = Scanner
 LEXERTEST = LexerTest
 PARSER = Parser
 COMPILER = Compiler
-EXAMPLES = tests/test_*.s
+EXAMPLES = examples/test_*.mylang
 
 lexer: src/*.lex
 	@echo "[*] Compiling lexer:"

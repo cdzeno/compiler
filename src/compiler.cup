@@ -8,6 +8,31 @@ action code {:
 	SymbolTable symbolTable = new SymbolTable();
 :}
 
+parser code{:
+	/* Ridefinizione del metodo che visualizza i messaggi di errore */
+	
+	public void unrecovered_syntax_error(Symbol cur_token) {
+		Scanner sc = (Scanner) getScanner();
+		report_fatal_error("syntax error at line "  + sc.currentLineNumber() + " : " + sc.yytext(), null);
+	}
+
+	@Override
+	public void report_fatal_error(String message, Object info){
+		System.err.println("[-] Fatal error: " + message);
+		done_parsing();
+	}
+
+	@Override
+	public void report_error(String message, Object info) {
+		System.err.println("[-] Error during parsing: " + message);
+	}
+
+	@Override
+	protected void report_expected_token_ids() {
+		//System.err.println("[-] Weila");
+	}
+:}
+
 terminal Integer	NUMBER;
 terminal String		IDENT;
 terminal String		STRING;
