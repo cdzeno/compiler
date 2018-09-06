@@ -1,5 +1,7 @@
 package lt.compiler;
 
+import lt.compiler.instr.InstrSeq;
+
 public class Program {
 	private InstrSeq instructions;
 	private SymbolTable symbolTable;
