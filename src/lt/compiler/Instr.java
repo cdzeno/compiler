@@ -44,13 +44,16 @@ class OutputInstr implements Instr {
 	}
 
 	public void generateCode(Codice c) {
+		if (expr != null) {
+			expr.generateCode(c);
+		}
+
 		for (char ch : output.toCharArray()) {
 			c.genera(PUSHIMM, ch);
 			c.genera(OUTPUTCH);
 		}
 		
 		if (expr != null) {
-			expr.generateCode(c);
 			c.genera(OUTPUT);
 		}
 	}
