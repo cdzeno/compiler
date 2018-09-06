@@ -10,7 +10,6 @@ import java_cup.runtime.*;
 %class Scanner
 %public
 
-%char
 %line
 %column
 
@@ -20,14 +19,12 @@ import java_cup.runtime.*;
         this(in);
         this.sf = sf;
     }
-%}
 
-%{
 	public int currentLineNumber() {
 		return yyline + 1;
 	}
 
-	public int currentColumn(){
+	public int currentColumnNumber(){
 		return yycolumn + 1;
 	}
 %}
@@ -73,5 +70,5 @@ COMMENT				= "//" .*
 {ENDL}               { return sf.newSymbol("ENDL", ParserSym.ENDL); }
 
 {SPACE} { }
-.                    { return sf.newSymbol("ERROR", ParserSym.error); }
+.                    { return sf.newSymbol("error", ParserSym.error); }
 <<EOF>>              { return sf.newSymbol("EOF", ParserSym.EOF); }

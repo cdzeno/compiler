@@ -9,48 +9,46 @@ import static lt.macchina.Macchina.*;
 
 public class Compiler {
 
-	public static String parseLineError(String file, int line){
-		// La colonna sarebbe superflua ma la uso per centrare la stringa
-		// e non stampare caratteri troppo lontani
+	private static void printErrorLine(String file, SyntaxErrorException e) {
 		BufferedReader reader;
+		String line = null;
 
-		try{
+		System.err.println("[-] " + e.getMessage());
+		try {
 			reader = new BufferedReader(new FileReader(file));
-			String lineString = null;
-			String parsedLine = null;
-			int counter = 1;
+			for (int i = 0; i < e.getLine(); ++i)
+				line = reader.readLine();
 
-			do {
-				lineString = reader.readLine();
+			System.err.println("      " + line);
 
-				if (counter == line){
-					parsedLine = lineString;
-				}
+			System.err.print("      ");
+			for (int i = 1; i < e.getColumn(); ++i) {
+				if (line.charAt(i-1) == '\t')
+					System.err.print("\t");
+				else
+					System.err.print(" ");
+			}
+			System.err.println("^");
 
-				counter++;
+			System.err.println("[-] Expected token classes are " + e.getExpectedTokens());
 
-			}while(lineString != null);
-
-			return parsedLine.trim();
-
-		}catch(IOException io){
-			System.err.println("[-] Error during parsing file...");
-			return null;
+		} catch (IOException io) {
+			System.err.println("[-] Error while parsing file \"" + file + "\"");
 		}
 	}
 
 	public static void main(String[] args) {
 		if (args.length != 2) {
-			System.err.println("usage: java Compiler <source-name> <output-name>");
+			System.err.println("usage: java lt.compiler.Compiler <source-name> <output-name>");
 			return;
 		}
 
 		BufferedReader in;
 
-		try{
+		try {
 			in = new BufferedReader(new FileReader(args[0]));
-		}catch (FileNotFoundException e) {
-			System.err.println("[-] Error during reading " + args[0]);
+		} catch (FileNotFoundException e) {
+			System.err.println("[-] Error while reading \"" + args[0] + "\"");
 			return;
 		}
 		
@@ -59,19 +57,18 @@ public class Compiler {
 		Parser parser = new Parser(scanner, sf);
 		Symbol result;
 
-		try{
+		try {
 			result = parser.parse();
-		}catch(ErrorParserException p){
-			System.err.println("[-] " + p.toString());
-			System.err.format("%10s%20s\n", "\t", parseLineError(args[0], p.getLine()) );
+		} catch (SyntaxErrorException e) {
+			printErrorLine(args[0], e);
 			return;
-		}catch(Exception e){
+		} catch (Exception e) {
 			System.err.println("[-] Unknown error from parsing");
+			e.printStackTrace();
 			return;
 		}
 		
-		if (result.value instanceof Program){
-			
+		if (result.value instanceof Program) {
 			Program program = (Program) result.value;
 			InstrSeq instructions = program.getInstructions();
 			SymbolTable symbolTable = program.getSymbolTable();
@@ -87,19 +84,15 @@ public class Compiler {
 				nextFreeAddr = d.assignAddress(nextFreeAddr);
 				code.genera(PUSHIMM, rand.nextInt());
 			}
-			/*code.genera(PUSHIMM, nextFreeAddr);
-			code.genera(MOVESP);*/
 
 			instructions.generateCode(code);
-
 			code.genera(HALT);
 
-			try{
+			try {
 				code.fineCodice();
-			}catch (IOException e) {
+			} catch (IOException e) {
 				System.err.println(e.toString());
 			}
-
 		}
 	}
 }
