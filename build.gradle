@@ -3,8 +3,6 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-defaultTasks 'test'
-
 repositories {
 	mavenCentral()
 }
@@ -15,21 +13,13 @@ configurations {
 }
 
 dependencies {
-	testCompile 'junit:junit:4.12'
 	jflex 'de.jflex:jflex:1.6.1'
 	cup files('lib/java-cup-11b.jar')
 	compile files('lib/java-cup-11b-runtime.jar', 'lib/ltMacchina.jar')
 }
 
 sourceSets {
-	main.java.srcDirs = ['src/main/java']
-	test.java.srcDirs = ['src/test']
-}
-
-test {
-	testLogging.events 'passed', 'failed'
-	testLogging.exceptionFormat = 'full'
-	dependsOn 'cleanTest'
+	main.java.srcDirs = ['src/main/java', 'src/test/java']
 }
 
 jar {
@@ -58,7 +48,6 @@ task generateParser(type: JavaExec, dependsOn: 'generateScanner') {
 
 	args '-destdir', file('src/main/java/lt/compiler').path, file('src/main/cup/parser.cup').path
 }
-//generateParser.dependsOn 'generateScanner'
 
 clean.dependsOn 'cleanGeneratedJava'
 
