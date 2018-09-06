@@ -61,7 +61,7 @@ public class Compiler {
 
 		try{
 			result = parser.parse();
-		}catch(ParserErrorException p){
+		}catch(ErrorParserException p){
 			System.err.println("[-] " + p.toString());
 			System.err.format("%10s%20s\n", "\t", parseLineError(args[0], p.getLine()) );
 			return;

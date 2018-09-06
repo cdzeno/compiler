@@ -12,9 +12,9 @@ action code {:
 
 parser code{:
 	
-	public void unrecovered_syntax_error(Symbol cur_token) throws ParserErrorException{
+	public void unrecovered_syntax_error(Symbol cur_token) throws ErrorParserException{
 		Scanner sc = (Scanner) getScanner();
-		throw new ParserErrorException(cur_token, sc.currentLineNumber(), sc.currentColumn());
+		throw new ErrorParserException(cur_token, sc.currentLineNumber(), sc.currentColumn());
 
 		//report_fatal_error("Syntax error at line "  + sc.currentLineNumber() + " : " + sc.yytext(), null);
 	}
