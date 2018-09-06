@@ -1,4 +1,10 @@
+.classpath
+.gradle/
+.project
+.settings
 bin/
-*.class
-src/lt/compiler/Scanner.java*
-src/lt/compiler/Parser*.java
+build/
+out/
+
+src/main/java/lt/compiler/Scanner.java*
+src/main/java/lt/compiler/Parser*.java
