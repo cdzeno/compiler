@@ -1,0 +1,61 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	jflex
+	cup
+}
+
+dependencies {
+	jflex 'de.jflex:jflex:1.6.1'
+	cup files('lib/java-cup-11b.jar')
+	compile files('lib/java-cup-11b-runtime.jar', 'lib/ltMacchina.jar')
+}
+
+sourceSets {
+	main.java.srcDirs = ['src/main/java', 'src/test/java']
+}
+
+jar {
+	manifest.attributes 'Main-Class': 'lt.compiler.Compiler'
+	destinationDir = file("$projectDir/build")
+	archiveName = 'ltCompiler.jar'
+
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+compileJava.dependsOn 'generateScanner', 'generateParser'
+
+task generateScanner(type: JavaExec) {
+	description 'Generates the scanner with JFlex.'
+	classpath = configurations.jflex
+	main = 'jflex.Main'
+
+	args '-d', file('src/main/java/lt/compiler').path, file('src/main/jflex/scanner.jflex').path
+}
+
+task generateParser(type: JavaExec, dependsOn: 'generateScanner') {
+	description 'Generates the parser with CUP.'
+	classpath = configurations.cup
+	workingDir = 'lib'
+	main = 'java_cup.Main'
+
+	args '-destdir', file('src/main/java/lt/compiler').path, file('src/main/cup/parser.cup').path
+}
+
+clean.dependsOn 'cleanGeneratedJava'
+
+task cleanGeneratedJava(type: Delete) {
+	description 'Remove generated Java code.'
+	delete file('src/main/java/lt/compiler/Scanner.java')
+	delete file('src/main/java/lt/compiler/Scanner.java~')
+	delete file('src/main/java/lt/compiler/Parser.java')
+	delete file('src/main/java/lt/compiler/ParserSym.java')
+}
+

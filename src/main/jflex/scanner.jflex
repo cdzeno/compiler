@@ -70,5 +70,5 @@ COMMENT				= "//" .*
 {ENDL}               { return sf.newSymbol("ENDL", ParserSym.ENDL); }
 
 {SPACE} { }
-.                    { return sf.newSymbol("error", ParserSym.error); }
+.                    { return sf.newSymbol("error", ParserSym.error, yytext()); }
 <<EOF>>              { return sf.newSymbol("EOF", ParserSym.EOF); }

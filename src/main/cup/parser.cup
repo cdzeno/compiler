@@ -3,6 +3,8 @@ package lt.compiler;
 import java_cup.runtime.*;
 import java.io.*;
 import java.util.*; 
+import lt.compiler.instr.*;
+import lt.compiler.expr.*;
 
 class Parser;
 
@@ -23,7 +25,6 @@ parser code{:
 	@Override
 	public void unrecovered_syntax_error(Symbol cur_token) throws SyntaxErrorException {
 		Scanner sc = (Scanner) getScanner();
-		//report_expected_token_ids();
 		throw new SyntaxErrorException(cur_token, sc.currentLineNumber(), sc.currentColumnNumber(), expectedTokens);
 	}
 

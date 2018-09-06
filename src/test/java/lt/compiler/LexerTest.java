@@ -1,3 +1,5 @@
+package lt.compiler;
+
 import java.io.*;
 import lt.compiler.*;
 import java_cup.runtime.Symbol;

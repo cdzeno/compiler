@@ -1,6 +1,6 @@
-package lt.compiler;
+package lt.compiler.instr;
 
-import lt.macchina.*;
+import lt.macchina.Codice;
 
 public class InstrSeq {
 	private InstrSeq nextInstructions;
