@@ -12,6 +12,7 @@ import java_cup.runtime.*;
 
 %char
 %line
+%column
 
 %{
     ComplexSymbolFactory sf;
@@ -24,6 +25,10 @@ import java_cup.runtime.*;
 %{
 	public int currentLineNumber() {
 		return yyline + 1;
+	}
+
+	public int currentColumn(){
+		return yycolumn + 1;
 	}
 %}
 

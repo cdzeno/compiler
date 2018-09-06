@@ -1,6 +1,8 @@
 package lt.compiler;
 
 import java_cup.runtime.*;
+import java.io.*;
+import java.util.*; 
 
 class Parser;
 
@@ -9,27 +11,38 @@ action code {:
 :}
 
 parser code{:
-	/* Ridefinizione del metodo che visualizza i messaggi di errore */
 	
-	public void unrecovered_syntax_error(Symbol cur_token) {
+	public void unrecovered_syntax_error(Symbol cur_token) throws ParserErrorException{
 		Scanner sc = (Scanner) getScanner();
-		report_fatal_error("syntax error at line "  + sc.currentLineNumber() + " : " + sc.yytext(), null);
+		throw new ParserErrorException(cur_token, sc.currentLineNumber(), sc.currentColumn());
+
+		//report_fatal_error("Syntax error at line "  + sc.currentLineNumber() + " : " + sc.yytext(), null);
 	}
 
-	@Override
+	/*@Override
 	public void report_fatal_error(String message, Object info){
-		System.err.println("[-] Fatal error: " + message);
-		done_parsing();
-	}
 
+		//System.err.println("[-] Fatal error: " + message);
+		done_parsing();
+	}*/
+
+	// Obbligatorio per evitare messaggi d'errori generati da CUP:
 	@Override
 	public void report_error(String message, Object info) {
-		System.err.println("[-] Error during parsing: " + message);
+		//System.err.println("[-] Error: " + message);
 	}
 
+	
 	@Override
-	protected void report_expected_token_ids() {
-		//System.err.println("[-] Weila");
+	protected void report_expected_token_ids(){
+
+		List<Integer> ids = expected_token_ids();
+		LinkedList<String> list = new LinkedList<String>();
+		 
+		for (Integer expected : ids)
+			list.add(symbl_name_from_id(expected));
+		 
+		System.err.println("[!] Expected token: " + list);
 	}
 :}
 

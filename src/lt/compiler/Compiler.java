@@ -9,12 +9,33 @@ import static lt.macchina.Macchina.*;
 
 public class Compiler {
 
-	public static boolean checkResult(Symbol result){
+	public static String parseLineError(String file, int line){
+		// La colonna sarebbe superflua ma la uso per centrare la stringa
+		// e non stampare caratteri troppo lontani
+		BufferedReader reader;
 
-		if (result.value instanceof Program){
-			return true;
-		}else{
-			return false;
+		try{
+			reader = new BufferedReader(new FileReader(file));
+			String lineString = null;
+			String parsedLine = null;
+			int counter = 1;
+
+			do {
+				lineString = reader.readLine();
+
+				if (counter == line){
+					parsedLine = lineString;
+				}
+
+				counter++;
+
+			}while(lineString != null);
+
+			return parsedLine.trim();
+
+		}catch(IOException io){
+			System.err.println("[-] Error during parsing file...");
+			return null;
 		}
 	}
 
@@ -24,7 +45,6 @@ public class Compiler {
 			return;
 		}
 
-		System.out.println("[+] Starting compiling " + args[0]);
 		BufferedReader in;
 
 		try{
@@ -41,18 +61,21 @@ public class Compiler {
 
 		try{
 			result = parser.parse();
+		}catch(ParserErrorException p){
+			System.err.println("[-] " + p.toString());
+			System.err.format("%10s%20s\n", "\t", parseLineError(args[0], p.getLine()) );
+			return;
 		}catch(Exception e){
+			System.err.println("[-] Unknown error from parsing");
 			return;
 		}
 		
-		if (checkResult(result)){
-			System.out.println("[+] Parsing ends without error");
+		if (result.value instanceof Program){
 			
 			Program program = (Program) result.value;
 			InstrSeq instructions = program.getInstructions();
 			SymbolTable symbolTable = program.getSymbolTable();
 
-			System.out.print("[+] Generating code");
 			Codice code = new Codice(args[1]);
 
 			// Reserve space for MOD registers (0-1) and variables (2...)
@@ -74,14 +97,9 @@ public class Compiler {
 			try{
 				code.fineCodice();
 			}catch (IOException e) {
-				System.err.println("...ERROR");
-				return;
+				System.err.println(e.toString());
 			}
 
-			System.out.println("...DONE");
-			System.out.println("[+] End of compilation, everything goes well.");
-		}else{
-			System.err.println("[-] Error during compilation...");
 		}
 	}
 }
