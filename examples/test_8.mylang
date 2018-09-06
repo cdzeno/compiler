@@ -1,0 +1,29 @@
+// Test di tutte le espressioni
+
+x = input "Inserisci il primo numero: "
+y = input "Inserisci il secondo numero: "
+
+output "x+y: " x+y 
+newLine
+
+output "x-y: " x-y 
+newLine
+
+output "x*y: " x*y 
+newLine
+
+output "x/y: " x/y 
+newLine
+
+output "x%y: " x%y 
+newLine
+
+output "Ternary operator:" (x%2 ? 1: 0)
+newLine
+
+output "More complex 1: " ((x = input "Complex 1:") % 2 ? 1:0)
+newLine
+
+x = input "Nested 1" = input "Nested 2"
+output "x: " x
+newLine
