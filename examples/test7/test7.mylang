@@ -1,11 +1,14 @@
 //Fibonacci
-n = 1 + input "n (>=1): "
+n = 1 + & //prosegue a capo con &
+    input "n (>=1): "
 a = 0
 b = 1
 
 loop n = n - 1
-	a = (b = a + b) - a
+    a = (b = a + b) &
+        - a
 endLoop
 
-output "f(n) = " b
+output "f(n) = " a
+newLine
 
