@@ -1,0 +1,23 @@
+// Legge una lista di numeri e computa il minimo [1,100]
+
+min = 100
+output "Init min: " min
+newLine
+
+loop i = input "Inserisci un numero (1,100): "
+    output "i: " i
+    newLine
+    count = 0
+
+    loop min * i 
+        min = min - 1 
+        i = i - 1
+        count = count + 1
+    endLoop
+
+    min = count
+endLoop
+
+output "Min: " min
+newLine
+

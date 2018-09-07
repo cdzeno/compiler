@@ -1,0 +1,26 @@
+//Test di tutte le espressioni
+
+x = input "x: "
+y = input "y: "
+
+output "x + y = " x + y
+newLine
+
+output "x - y = " x - y
+newLine
+
+output "x * y = " x * y
+newLine
+
+output "x / y = " x / y
+newLine
+
+output "x % y = " x % y
+newLine
+
+output "Ternary operator:" ((x * y) ? 1 : 0)
+newLine
+
+output "x != 0? " ((x = input "x: ") ? 1 : 0)
+newLine
+

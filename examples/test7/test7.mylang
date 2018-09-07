@@ -1,0 +1,11 @@
+//Fibonacci
+n = 1 + input "n (>=1): "
+a = 0
+b = 1
+
+loop n = n - 1
+	a = (b = a + b) - a
+endLoop
+
+output "f(n) = " b
+

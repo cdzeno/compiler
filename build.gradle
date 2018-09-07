@@ -57,5 +57,7 @@ task cleanGeneratedJava(type: Delete) {
 	delete file('src/main/java/lt/compiler/Scanner.java~')
 	delete file('src/main/java/lt/compiler/Parser.java')
 	delete file('src/main/java/lt/compiler/ParserSym.java')
+	delete fileTree(dir: 'examples', include: '**/*.o')
+	delete fileTree(dir: 'examples', include: '**/*.out')
 }
 
