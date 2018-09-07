@@ -9,59 +9,59 @@ import lt.compiler.expr.*;
 class Parser;
 
 action code {:
-	SymbolTable symbolTable = new SymbolTable();
+    SymbolTable symbolTable = new SymbolTable();
 :}
 
 parser code{:
-	private List<String> expectedTokens;
+    private List<String> expectedTokens;
 
-	@Override
-	public void syntax_error(Symbol cur_token) {
-		// report_error("Syntax error", cur_token);
-		// report_expected_token_ids();
-		expectedTokens = expected_tokens();
-	}
+    @Override
+    public void syntax_error(Symbol cur_token) {
+        // report_error("Syntax error", cur_token);
+        // report_expected_token_ids();
+        expectedTokens = expected_tokens();
+    }
 
-	@Override
-	public void unrecovered_syntax_error(Symbol cur_token) throws SyntaxErrorException {
-		Scanner sc = (Scanner) getScanner();
-		throw new SyntaxErrorException(cur_token, sc.currentLineNumber(), sc.currentColumnNumber(), expectedTokens);
-	}
+    @Override
+    public void unrecovered_syntax_error(Symbol cur_token) throws SyntaxErrorException {
+        Scanner sc = (Scanner) getScanner();
+        throw new SyntaxErrorException(cur_token, sc.currentLineNumber(), sc.currentColumnNumber(), expectedTokens);
+    }
 
-	public List<String> expected_tokens() {
-		List<Integer> ids = expected_token_ids();
-		LinkedList<String> list = new LinkedList<String>();
-		 
-		for (Integer expected : ids)
-			list.add(symbl_name_from_id(expected));
+    public List<String> expected_tokens() {
+        List<Integer> ids = expected_token_ids();
+        LinkedList<String> list = new LinkedList<String>();
+         
+        for (Integer expected : ids)
+            list.add(symbl_name_from_id(expected));
 
-		return list;
-	}
+        return list;
+    }
 
-	@Override
-	protected void report_expected_token_ids() {
-		System.out.println("instead expected token classes are " + expected_tokens());
-	}
+    @Override
+    protected void report_expected_token_ids() {
+        System.out.println("instead expected token classes are " + expected_tokens());
+    }
 :}
 
-terminal Integer	NUMBER;
-terminal String		IDENT;
-terminal String		STRING;
+terminal Integer    NUMBER;
+terminal String     IDENT;
+terminal String     STRING;
 
-terminal	ADD, SUB, MUL, DIV, MOD, EQU;
-terminal 	UNARY, OPEN_PAR, CLOSED_PAR;
-terminal 	QUESTION, COLON;
-terminal 	INPUT, OUTPUT, NEWLINE;
-terminal	LOOP, ENDLOOP;
-terminal 	ENDL;
+terminal    ADD, SUB, MUL, DIV, MOD, EQU;
+terminal    UNARY, OPEN_PAR, CLOSED_PAR;
+terminal    QUESTION, COLON;
+terminal    INPUT, OUTPUT, NEWLINE;
+terminal    LOOP, ENDLOOP;
+terminal    ENDL;
 
-non terminal Program	program;
-non terminal InstrSeq	instrSeq;
-non terminal Instr		instr;
-non terminal Instr		assign;
-non terminal Instr		write;
-non terminal Instr		loop;
-non terminal Expr		expr;
+non terminal Program    program;
+non terminal InstrSeq   instrSeq;
+non terminal Instr      instr;
+non terminal Instr      assign;
+non terminal Instr      write;
+non terminal Instr      loop;
+non terminal Expr       expr;
 
 precedence right EQU;
 precedence right QUESTION;
@@ -71,74 +71,74 @@ precedence nonassoc UNARY;
 
 start with program;
 
-program		::=	instrSeq:s
-				{: RESULT = new Program(s, symbolTable); :}
-			;
+program     ::=    instrSeq:s
+                {: RESULT = new Program(s, symbolTable); :}
+            ;
 
-instrSeq	::=	instr:i ENDL
-				{: RESULT = new InstrSeq(i); :}
-			  |	instrSeq:s instr:i ENDL
-				{: RESULT = new InstrSeq(s, i); :}
-			;
+instrSeq    ::=    instr:i ENDL
+                {: RESULT = new InstrSeq(i); :}
+              |    instrSeq:s instr:i ENDL
+                {: RESULT = new InstrSeq(s, i); :}
+            ;
 
-instr		::=	assign:a
-				{: RESULT = a; :}
-			  |	write:w
-				{: RESULT = w; :}
-			  |	loop:l
-				{: RESULT = l; :}
-			;
+instr       ::=    assign:a
+                {: RESULT = a; :}
+              |    write:w
+                {: RESULT = w; :}
+              |    loop:l
+                {: RESULT = l; :}
+            ;
 
-assign		::=	IDENT:id EQU expr:e
-				{: Descriptor d = symbolTable.findInsert(id);
-				   RESULT = new AssignInstr(d, e); :}
-			;
+assign      ::=    IDENT:id EQU expr:e
+                {: Descriptor d = symbolTable.findInsert(id);
+                   RESULT = new AssignInstr(d, e); :}
+            ;
 
-write		::=	OUTPUT STRING:s expr:e
-				{: RESULT = new OutputInstr(s, e); :}
-			  |	OUTPUT STRING:s
-				{: RESULT = new OutputInstr(s); :}
-			  |	OUTPUT expr:e
-				{: RESULT = new OutputInstr(e); :}
-			  |	NEWLINE
-				{: RESULT = new OutputInstr("\n"); :}
-			;
+write       ::=    OUTPUT STRING:s expr:e
+                {: RESULT = new OutputInstr(s, e); :}
+              |    OUTPUT STRING:s
+                {: RESULT = new OutputInstr(s); :}
+              |    OUTPUT expr:e
+                {: RESULT = new OutputInstr(e); :}
+              |    NEWLINE
+                {: RESULT = new OutputInstr("\n"); :}
+            ;
 
-loop	::=	LOOP expr:cond ENDL instrSeq:body ENDLOOP
-				{: RESULT = new LoopInstr(cond, body); :}
-			;
+loop        ::=    LOOP expr:cond ENDL instrSeq:body ENDLOOP
+                {: RESULT = new LoopInstr(cond, body); :}
+            ;
 
-expr		::=	NUMBER:n
-				{: RESULT = new NumberExpr(n); :}
-			  |	IDENT:id
-				{: Descriptor d = symbolTable.findInsert(id);
-				   RESULT = new IdExpr(d); :}
-			  |	expr:e1 ADD expr:e2
-				{: RESULT = new AddExpr(e1, e2); :}
-			  |	expr:e1 SUB expr:e2
-				{: RESULT = new SubExpr(e1, e2); :}
-			  |	expr:e1 MUL expr:e2
-				{: RESULT = new MulExpr(e1, e2); :}
-			  |	expr:e1 DIV expr:e2
-				{: RESULT = new DivExpr(e1, e2); :}
-			  |	expr:e1 MOD expr:e2
-				{: RESULT = new ModExpr(e1, e2); :}
-			  |	SUB expr:e
-				{: RESULT = new UnaryMinusExpr(e); :}
-				%prec UNARY
-			  |	ADD expr:e
-				{: RESULT = e; /*new UnaryPlusExpr(e);*/ :}
-				%prec UNARY
-			  |	OPEN_PAR expr:e CLOSED_PAR
-				{: RESULT = e; :}
-			  |	IDENT:id EQU expr:e
-				{: Descriptor d = symbolTable.findInsert(id);
-				   RESULT = new AssignExpr(d, e); :}
-			  |	expr:cond QUESTION expr:e1 COLON expr:e2
-				{: RESULT = new TernaryExpr(cond, e1, e2); :}
-			  |	INPUT
-				{: RESULT = new InputExpr(); :}
-			  |	INPUT STRING:prompt
-				{: RESULT = new InputExpr(prompt); :}
-			;
+expr        ::=    NUMBER:n
+                {: RESULT = new NumberExpr(n); :}
+              |    IDENT:id
+                {: Descriptor d = symbolTable.findInsert(id);
+                   RESULT = new IdExpr(d); :}
+              |    expr:e1 ADD expr:e2
+                {: RESULT = new AddExpr(e1, e2); :}
+              |    expr:e1 SUB expr:e2
+                {: RESULT = new SubExpr(e1, e2); :}
+              |    expr:e1 MUL expr:e2
+                {: RESULT = new MulExpr(e1, e2); :}
+              |    expr:e1 DIV expr:e2
+                {: RESULT = new DivExpr(e1, e2); :}
+              |    expr:e1 MOD expr:e2
+                {: RESULT = new ModExpr(e1, e2); :}
+              |    SUB expr:e
+                {: RESULT = new UnaryMinusExpr(e); :}
+                %prec UNARY
+              |    ADD expr:e
+                {: RESULT = e; /*new UnaryPlusExpr(e);*/ :}
+                %prec UNARY
+              |    OPEN_PAR expr:e CLOSED_PAR
+                {: RESULT = e; :}
+              |    IDENT:id EQU expr:e
+                {: Descriptor d = symbolTable.findInsert(id);
+                   RESULT = new AssignExpr(d, e); :}
+              |    expr:cond QUESTION expr:e1 COLON expr:e2
+                {: RESULT = new TernaryExpr(cond, e1, e2); :}
+              |    INPUT
+                {: RESULT = new InputExpr(); :}
+              |    INPUT STRING:prompt
+                {: RESULT = new InputExpr(prompt); :}
+            ;
 
