@@ -15,58 +15,61 @@ public class Compiler {
         String line = null;
 
         System.err.println("[-] " + e.getMessage());
-        try {
-            reader = new BufferedReader(new FileReader(file));
-            for (int i = 0; i < e.getLine(); ++i)
-                line = reader.readLine();
 
-            System.err.println("      " + line);
+        if (e.getToken().sym != ParserSym.EOF) {
+            try {
+                reader = new BufferedReader(new FileReader(file));
+                for (int i = 0; i < e.getLine(); ++i)
+                    line = reader.readLine();
 
-            System.err.print("      ");
-            for (int i = 1; i < e.getColumn(); ++i) {
-                if (line.charAt(i-1) == '\t')
-                    System.err.print("\t");
-                else
-                    System.err.print(" ");
+                System.err.println("      " + line);
+
+                System.err.print("      ");
+                for (int i = 1; i < e.getColumn(); ++i) {
+                    if (line.charAt(i-1) == '\t')
+                        System.err.print("\t");
+                    else
+                        System.err.print(" ");
+                }
+                System.err.println("^");
+
+            } catch (IOException io) {
+                System.err.println("[-] Error while parsing file \"" + file + "\"");
             }
-            System.err.println("^");
-
-            System.err.println("[-] Expected token classes are " + e.getExpectedTokens());
-
-        } catch (IOException io) {
-            System.err.println("[-] Error while parsing file \"" + file + "\"");
         }
+
+        System.err.println("[-] Expected token classes are " + e.getExpectedTokens());
     }
 
     public static void main(String[] args) {
         if (args.length != 2) {
             System.err.println("usage: java lt.compiler.Compiler <source-name> <output-name>");
-            return;
+            System.exit(1);
         }
 
-        BufferedReader in;
+        BufferedReader in = null;
 
         try {
             in = new BufferedReader(new FileReader(args[0]));
         } catch (FileNotFoundException e) {
             System.err.println("[-] Error while reading \"" + args[0] + "\"");
-            return;
+            System.exit(1);
         }
         
         ComplexSymbolFactory sf = new ComplexSymbolFactory();
         Scanner scanner = new Scanner(in, sf);
         Parser parser = new Parser(scanner, sf);
-        Symbol result;
+        Symbol result = null;
 
         try {
             result = parser.parse();
         } catch (SyntaxErrorException e) {
             printErrorLine(args[0], e);
-            return;
+            System.exit(1);
         } catch (Exception e) {
             System.err.println("[-] Unknown error from parsing");
             e.printStackTrace();
-            return;
+            System.exit(1);
         }
         
         if (result.value instanceof Program) {
@@ -93,6 +96,7 @@ public class Compiler {
                 code.fineCodice();
             } catch (IOException e) {
                 System.err.println(e.toString());
+                System.exit(1);
             }
         }
     }
