@@ -9,3 +9,10 @@ out/
 src/main/java/lt/compiler/Scanner.java*
 src/main/java/lt/compiler/Parser*.java
 examples/**/*.o
+
+doc/**/*.aux
+doc/**/*.log
+doc/**/*.out
+doc/**/*.pdf
+doc/**/*.toc
+
