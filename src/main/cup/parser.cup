@@ -12,7 +12,7 @@ action code {:
     SymbolTable symbolTable = new SymbolTable();
 :}
 
-parser code{:
+parser code {:
     private List<String> expectedTokens;
 
     @Override
@@ -127,7 +127,7 @@ expr        ::=    NUMBER:n
                 {: RESULT = new UnaryMinusExpr(e); :}
                 %prec UNARY
               |    ADD expr:e
-                {: RESULT = e; /*new UnaryPlusExpr(e);*/ :}
+                {: RESULT = e; :}
                 %prec UNARY
               |    OPEN_PAR expr:e CLOSED_PAR
                 {: RESULT = e; :}

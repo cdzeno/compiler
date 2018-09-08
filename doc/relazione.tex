@@ -28,7 +28,7 @@
 
 \subsection{Struttura del progetto}
 Si riporta di seguito la struttura ad albero con cui sono organizzati i file sorgenti del compilatore, i quali si trovano sotto la directory \texttt{src}:
-\vspace{6pt}
+\vspace{10pt}
 \dirtree{%
 .1 src.
 .2 main.
@@ -39,10 +39,7 @@ Si riporta di seguito la struttura ad albero con cui sono organizzati i file sor
 .5 compiler.
 .6 Compiler.java.
 .6 Descriptor.java.
-.6 Parser.java.
-.6 ParserSym.java.
 .6 Program.java.
-.6 Scanner.java.
 .6 SymbolTable.java.
 .6 SyntaxErrorException.java.
 .6 expr.
@@ -58,7 +55,7 @@ Si riporta di seguito la struttura ad albero con cui sono organizzati i file sor
 .7 SubExpr.java.
 .7 TernaryExpr.java.
 .7 UnaryMinusExpr.java.
-.6 istr.
+.6 instr.
 .7 AssignInstr.java.
 .7 Instr.java.
 .7 InstrSeq.java.
@@ -72,124 +69,160 @@ Si riporta di seguito la struttura ad albero con cui sono organizzati i file sor
 .5 compiler.
 .6 LexerTest.java.
 }
-\vspace{8pt}
-Nei paragrafi seguenti verrà descritto il funzionamento di ciascuna classe in base al suo utilizzo durante le fasi di compilazione.
+\vspace{10pt}
+Nei paragrafi successivi verrà descritto il funzionamento di ciascuna classe in base al suo utilizzo durante le varie fasi di compilazione.
 
 \subsection{Build del progetto}
-Per poter gestire in maniera più veloce e semplice la fase di building del progetto, quest'ultimo è stato gestito utilizzando il tool Gradle. Per questo motivo, i passi per poter effettuare il building richiedono l'esecuzione del comando \texttt{./gradlew build} su sistemi Linux / macOS mentre il comando \texttt{gradlew.bat build} su sistemi Windows.
+Per poter gestire in maniera più veloce e semplice la fase di building del progetto, quest'ultimo è stato gestito utilizzando il tool Gradle.
+Per questo motivo, i passi per poter effettuare il building richiedono l'esecuzione del comando \texttt{./gradlew build} su sistemi Linux/macOS mentre il comando \texttt{gradlew.bat build} su sistemi Windows.
 Tale script genera l'archivio \texttt{ltCompiler.jar} all'interno della directory \texttt{build} del progetto.
 
 \subsection{Compilazione ed esecuzione}
-Per poter rendere più semplice ed immediata la compilazione e l'esecuzione dei sorgenti del linguaggio creato, si consiglia rispettivamente l'utilizzo degli script \texttt{compile.sh} ed \texttt{exec.sh}. Il primo script richiede come argomenti (in ordine) il nome del file sorgente da compilare, e il nome del file oggetto (output della compilazione). Il secondo, invece, richiede come argomento il file oggetto e lo esegue utilizzando \texttt{lib/ltMacchina.jar}.
+Per rendere più semplice ed immediata la compilazione di sorgenti e la successiva esecuzione, si consiglia rispettivamente l'utilizzo degli script \texttt{compile.sh} ed \texttt{exec.sh}.
+Il primo script richiede come argomenti (in ordine) il nome del file sorgente da compilare, e il nome del file oggetto da generare (output della compilazione).
+Il secondo, invece, richiede come argomento il file oggetto e lo esegue utilizzando \texttt{lib/ltMacchina.jar}.
+Sono inoltre presenti altri due script per testare il progetto.
+Uno di essi è \texttt{testLexer.sh}, il quale esegue il metodo \texttt{main} della classe \texttt{LexerTest} (vedi paragrafo \ref{testLexer}).
+L'altro si chiama \texttt{compileExamples.sh}, e permette la compilazione dei sorgenti d'esempio presenti nella directory \texttt{examples/} (vedi paragrafo \ref{examples}).
 
-\section{Analisi Lessicale}
+\section{Analisi Lessicale} \label{analisiLessicale}
 
-\subsection{\texttt{src/main/jflex/scanner.flex}}
-Per la realizzazione dell'analizzatore lessicale è stato utilizzato JFlex. Il file di specifica, contenente le direttive per la scansione di file sorgenti, e la conseguente produzione di token compatibili con il parser generato da CUP, si trovano all'interno del file \texttt{src/main/jflex/scanner.jflex}. Una volta compilato, viene prodotto il file \texttt{src/main/java/lt/compiler/Scanner.java}, contenente la classe dello scanner. Oltre ad inserire le espressioni regolari necessarie per il riconoscimento delle parole riservate del linguaggio e delle altre strutture (identificatori, letterali, stringhe, ...), è stato inserito il codice necessario per integrare la \texttt{ComplexSymbolFactory} di CUP e permettere quindi la generazione di token ad esso compatibili. Sono inoltre stati gestiti, come suggerito nella traccia del progetto, i commenti, le righe vuote e le interruzioni di riga `\&' mediante la loro eliminazione (non viene restituito alcun token al loro riconoscimento).
+\subsection{\texttt{src/main/jflex/scanner.jflex}} \label{lexer}
+Per la realizzazione dell'analizzatore lessicale è stato utilizzato JFlex. Le direttive per la scansione di file sorgenti e la conseguente produzione di token (compatibili con il parser generato da CUP), si trovano all'interno del file di specifica \texttt{scanner.jflex}.
+Una volta compilato con JFlex, viene prodotto il file \texttt{src/main/java/lt/compiler/Scanner.java}, contenente la classe dello scanner.
+Oltre alla definizione delle espressioni regolari necessarie per il riconoscimento delle parole riservate del linguaggio e delle altre strutture lessicali (identificatori, letterali numerici, stringhe, ...), è stato inserito il codice necessario per integrare la \texttt{ComplexSymbolFactory} di CUP, generando token ad esso compatibili.
+Sono inoltre stati gestiti, come suggerito nella traccia del progetto, i commenti, le righe vuote e le interruzioni di riga `\&' mediante la loro eliminazione (non viene restituito alcun token al loro riconoscimento).
 
-\subsection{\texttt{src/test/java/lt/compiler/LexerTest.java}}
-La classe di test \texttt{LexerTest.java} è stata scritta per poter testare l'analizzatore lessicale prodotto. Il suo funzionamento consiste nell'elencazione di tutti i token prodotti dalla classe \texttt{Scanner}.
+\subsection{\texttt{src/test/java/lt/compiler/LexerTest.java}} \label{testLexer}
+La classe \texttt{LexerTest.java} è stata scritta per poter testare l'analizzatore lessicale.
+Il suo funzionamento consiste nell'elencazione di tutti i token prodotti dalla classe \texttt{Scanner}, leggendo codice sorgente da standard input.
 
 \pagebreak
 
 \section{Analisi Sintattica} \label{analisiSintattica}
 
 \subsection{\texttt{src/main/cup/parser.cup}}
-L'analisi sintattica è stata effettuata invece grazie all'utilizzo di CUP che ha permesso la generazione dell'Abstract Syntax Tree (AST). Il file di specifica contenente le regole grammaticali è nominato come \texttt{parser.cup}. Dalla compilazione del file di specifica \texttt{parser.cup} vengono generate le classi \texttt{Parser.java} e \texttt{ParserSym.java} che contiene le costanti enumerative corrispondenti ai simboli terminali della grammatica.
-Le regole grammaticali inserite nel file \texttt{parser.cup} aderiscono fedelmente alle specifiche indicate nel documento di specifica. Oltre a ciò sono state inserite al parser istruzioni Java aggiuntive al fine di controllore le eccezioni ed i possibili errori generabili in fase di parsing.
-Esse riguardano l'overriding dei metodi standard usati dal parser e l'inserimento di un'eccezione creata ad hoc da noi (\texttt{SyntaxErrorException}) che verrà sfruttata nella classe \texttt{Compiler.java} per visualizzare la linea del sorgente afflitta da un errore sintattico e fornire suggerimenti su come correggere lo stesso. Nei successivi paragrafi verranno descritte nel dettaglio le classi utilizzate per la modellazione e costruzione dell'AST.
+L'analizzatore sintattico è stato realizzato usufruendo di CUP, e permette di generare l'Abstract Syntax Tree (insieme alla symbol table) a partire dai token prodotti dal lexer (come accennato al paragrafo \ref{lexer}).
+Il file di specifica contenente le regole grammaticali è nominato \texttt{parser.cup}.
+Dalla compilazione di questo file di specifica, vengono generate due classi dentro la directory \texttt{src/main/java/lt/compiler}.
+I file che contengono tali classi sono:
+\begin{itemize}
+    \item \texttt{Parser.java}: il parser che riconosce la grammatica (come definita nelle specifiche del progetto).
+    \item \texttt{ParserSym.java}: contiene le costanti enumerative corrispondenti ai simboli terminali della grammatica.
+\end{itemize}
+Le regole grammaticali presenti in \texttt{parser.cup} aderiscono fedelmente alle specifiche indicate nel documento di specifica.
+Oltre a ciò, nella sezione \textit{parser code} sono stati inseriti alcuni metodi (Java) al fine di controllare i possibili errori sintattici identificabili in fase di parsing, per poi sollevare eccezioni appropriate.
+Ciò è stato ottenuto tramite l'overriding dei metodi standard usati dal parser, e definendo un'eccezione ad-hoc (\texttt{SyntaxErrorException}).
+Nei successivi paragrafi è presente una descrizione più dettagliata delle classi utilizzate nella rappresentazione e costruzione dell'AST.
 
 \subsection{\texttt{src/main/java/lt/compiler/Program.java}}
-La classe \texttt{Program} viene restituita dal simbolo iniziale della grammatica e contiene la radice dell'AST, ovvero un riferimento alla sequenza principale di istruzioni del programma, oltre che alla symbol table. Mediante l'utilizzo del metodo \texttt{getInstructions} è possibile ottenere il riferimento alla radice della struttura come puntatore all'oggetto di tipo \texttt{InstrSeq}.
+Un'istanza della classe \texttt{Program} viene restituita per rappresentare il simbolo iniziale della grammatica, e contiene la radice dell'AST, ovvero un riferimento alla sequenza principale di istruzioni del programma, oltre che alla symbol table.
+Mediante l'utilizzo del metodo \texttt{getInstructions()} è possibile ottenere il riferimento alla radice della struttura come puntatore a un oggetto di tipo \texttt{InstrSeq}.
 
 \subsection{\texttt{src/main/java/lt/compiler/instr/InstrSeq.java}}
-Questa classe modella una sequenza di istruzioni sotto forma di linked list. L'unica operazione significativa in essa contenuta è \texttt{generateCode} che si occupa di generare il codice dell'istruzione di cui tiene il riferimento e richiamare il medesimo metodo sul riferimento al resto della sequenza.
+Questa classe modella una sequenza di istruzioni sotto forma di linked list.
+L'unica operazione significativa in essa contenuta è \texttt{generateCode(Codice c)}, che si occupa di generare il codice dell'istruzione di cui tiene il riferimento e richiamare il medesimo metodo sul riferimento al resto della sequenza.
+Essa richiede un solo parametro, ossia un'istanza della classe \texttt{Codice} appartenente al package \texttt{lt.macchina} (presente nella libreria \texttt{ltMacchina.jar}), la quale viene usata per generare istruzioni eseguibili dalla macchina a stack di riferimento.
 
 \subsection{\texttt{src/main/java/lt/compiler/instr/Instr.java}}
-L'interfaccia \texttt{Instr} definisce il metodo \texttt{void generateCode(Codice c)} che verrà poi implementato dalle classi che modellano tutte le istruzioni disponibili nel linguaggio.
+L'interfaccia \texttt{Instr} definisce il metodo \texttt{void generateCode(Codice c)} che sarà implementato dalle classi che modellano i vari tipi di istruzione disponibili nel linguaggio.
 
-\subsubsection{Sottoclassi di \texttt{Instr.java}}
-Sotto la directory \texttt{src/main/java/lt/compiler/instr} sono contenute le tre classi che modellano le istruzioni del linguaggio implementando il metodo \texttt{void generateCode(Codice c)}. Le classi in questione sono:
+\subsubsection{Sottoclassi di \texttt{Instr}}
+Nella directory \texttt{src/main/java/lt/compiler/instr}, oltre ad \texttt{Instr.java} sono presenti i file delle tre classi che modellano le istruzioni del linguaggio (implementando il metodo \texttt{generateCode(Codice c)} per tradurle).
+Essi sono:
 \begin{itemize}
-    \item \texttt{AssignInstr}: permette di gestire istruzioni di assegnamento.
-    \item \texttt{OutputInstr}: utilizzata per realizzare le istruzioni di output.
-    \item \texttt{LoopInstr}: classe che modella l'istruzione di ciclo.
+    \item \texttt{AssignInstr.java}: permette di gestire istruzioni di assegnamento.
+    \item \texttt{OutputInstr.java}: utilizzata per realizzare le istruzioni di output.
+    \item \texttt{LoopInstr.java}: classe che modella l'istruzione di ciclo.
 \end{itemize}
-\pagebreak
 
 \subsection{\texttt{src/main/java/lt/compiler/expr/Expr.java}}
-Così come \texttt{Instr.java}, anche \texttt{Expr.java} è un'interfaccia che dichiara il metodo \texttt{void generateCode(Codice c)}. Esso verrà poi implementato dalle classi che modellano tutte le espressioni ammissibili dal linguaggio.
+Così come \texttt{Instr.java}, anche \texttt{Expr.java} è un'interfaccia che dichiara il metodo \texttt{void generateCode(Codice c)}.
+Essa viene implementata dalle classi che modellano le varie espressioni ammissibili dal linguaggio.
 
-\subsubsection{Sottoclassi di \texttt{Expr.java}}
-Le sottoclassi di \texttt{Expr} presenti dentro la directory \texttt{src/main/java/lt/compiler/expr/} permettono di realizzare le espressioni ammesse dal linguaggio. In particolare troviamo:
+\subsubsection{Sottoclassi di \texttt{Expr}}
+Dentro la directory \texttt{src/main/java/lt/compiler/expr/} si trovano le sottoclassi di \texttt{Expr}, le quali permettono di rappresentare le espressioni ammesse dal linguaggio.
+In particolare, troviamo:
 \begin{itemize}
-    \item AddExpr.java: modella l'operazione aritmetica di \textit{somma}.
-    \item SubExpr.java: modella l'operazione aritmetica di \textit{sottrazione}.
-    \item MulExpr.java: modella l'operazione aritmetica di \textit{moltiplicazione}.
-    \item DivExpr.java: modella l'operazione aritmetica di \textit{divisione}.
-    \item ModExpr.java: modella l'operazione aritmetica di \textit{modulo}.
-    \item IdExpr.java: usata per rappresentare le variabili del linguaggio.
-    \item AssignExpr.java: modella l'istruzione di assegnamento. 
-    \item NumberExpr.java: permette di gestire i letterali del linguaggio.
-    \item TernaryExpr.java: classe usata per modellare l'operatore ternario.
-    \item UnaryMinusExpr.java: usata per gestire le espressioni negative. 
-    \item InputExpr.java: modella le istruzioni di input.
+	\itemsep0em
+    \item \texttt{AddExpr.java}: modella l'operazione aritmetica di \textit{addizione}.
+    \item \texttt{SubExpr.java}: modella l'operazione aritmetica di \textit{sottrazione}.
+    \item \texttt{MulExpr.java}: modella l'operazione aritmetica di \textit{moltiplicazione}.
+    \item \texttt{DivExpr.java}: modella l'operazione aritmetica di \textit{divisione}.
+    \item \texttt{ModExpr.java}: modella l'operazione aritmetica di \textit{modulo} ($\%$).
+    \item \texttt{IdExpr.java}: rappresenta variabili del linguaggio dentro espressioni.
+    \item \texttt{AssignExpr.java}: modella l'istruzione di assegnamento come espressione. 
+    \item \texttt{NumberExpr.java}: permette di gestire i letterali numerici.
+    \item \texttt{TernaryExpr.java}: classe usata per modellare l'operatore ternario.
+    \item \texttt{UnaryMinusExpr.java}: usata per gestire la negazione (meno unario). 
+    \item \texttt{InputExpr.java}: modella le istruzioni di input (con eventuale prompt).
 \end{itemize}
 
 \subsection{\texttt{src/main/java/lt/compiler/SymbolTable.java}}
-All'interno del file \texttt{SymbolTable.java} si trova l'implementazione della Symbol table. La tabella è un oggetto \textit{Vector} di oggetti di tipo \textit{Descriptor} i quali rappresentano ognuno una variabile. I metodi messi a disposizione sono:
+All'interno del file \texttt{SymbolTable.java} si trova l'implementazione della symbol table.
+I descrittori delle variabili (rappresentati da istanze di \texttt{Descriptor}) sono memorizzati nella tabella all'interno di un oggetto di tipo \texttt{Vector}.
+Tale scelta è dovuta al fatto che non si ha la necessità di reperire i descrittori in modo efficiente, dato che l'unico loro utilizzo è fatto nella traduzione delle istruzioni.
+Infatti, le istruzioni o le espressioni che necessitano il valore delle variabili possiedono già un riferimento al oggetto \texttt{Descriptor} associato all'identificatore richiesto (il quale è stato assegnato direttamente dal parser in fase di analisi sintattica).
+Altrimenti, la scelta più appropriata sarebbe stata una mappa associativa (e.g. \texttt{HashMap}).
+Sono stati messi a disposizione da \texttt{SymbolTable} dei metodi per operazioni di ricerca ed inserimento (effettivamente usati solo dal parser), i quali sono:
 \begin{itemize}
-\item \texttt{find}: prende in input il nome di un descrittore di una stringa nella tabella, se non c'è restituisce \textit{null} altrimenti ne restituisce il riferimento.
-\item \texttt{insert}: metodo usato per cercare un descrittore all'interno della tabella.
-\item \texttt{findInsert}: cerca nella tabella il descrittore associato al nome preso come argomento, se non c'è lo aggiunge.
+    \item \texttt{Descriptor find(String s)}: prende in input un identificatore (stringa) e restituisce il descrittore ad esso associato (oppure \texttt{null} se non presente nella symbol table).
+    \item \texttt{void insert(Descriptor d)}: metodo usato per inserire un descrittore all'interno della tabella.
+    \item \texttt{Descriptor findInsert(String s)}: cerca nella tabella il descrittore associato al identificatore passato come argomento, e se non presente lo istanzia ed inserisce in tabella.
 \end{itemize}
-\pagebreak
 
 \subsubsection{\texttt{src/main/java/lt/compiler/Descriptor.java}}
-La classe \texttt{Descriptor} rappresenta la singola entry della Symbol table. Ad ogni variabile è associato un unico descrittore che contiene i seguenti campi:
+La classe \texttt{Descriptor} rappresenta la singola entry della symbol table.
+Ad ogni variabile è associato un unico descrittore che contiene i seguenti attributi:
 \begin{itemize}
-\item \texttt{identifier}: nome dell'identificatore.
-\item \texttt{address}: indirizzo di memoria assegnato alla variabile.
-\item \texttt{length}: lunghezza che occupa la variabile, utile per sviluppi futuri nel caso di variabili che occupano più di un intero.
+    \item \texttt{String identifier}: nome dell'identificatore.
+    \item \texttt{int address}: indirizzo di memoria (stack della macchina) assegnato alla variabile.
+    \item \texttt{int length}: lunghezza che occupa la variabile (attualmente fissato ad 1), utile per sviluppi futuri nel caso di variabili che occupano più di un intero.
 \end{itemize}
-I metodi all'interno di questa questa classe sono esclusivamente getter e setter dei campi e il metodo \texttt{equals}.
+I metodi all'interno di questa questa classe sono esclusivamente getter e setter degli attributi, e il metodo \texttt{equals}.
 
 \subsection{\texttt{src/main/java/lt/compiler/SyntaxErrorException.java}}
-La classe \texttt{SyntaxErrorException} estende \texttt{RuntimeException} e viene utilizzata dal parser in fase di analisi sintattica per segnalare errori sintattici. I campi della classe sono:
+La classe \texttt{SyntaxErrorException} estende \texttt{RuntimeException} e viene utilizzata dal parser per segnalare errori sintattici.
+Gli attributi della classe sono:
 \begin{itemize}
-\item \texttt{Symbol token}: rappresenta l'oggetto \textit{token} su cui il parser si è bloccato per via di un errore sintattico.
-\item \texttt{int line}: linea nel file sorgente in cui si trova l'espressione relativa al token in questione.
-\item \texttt{int column}: colonna nel file sorgente in cui si trova l'errore.
-\item \texttt{List<String> expectedTokens}: lista di stringhe che rappresentano i token che il parser si aspetta sulla base delle regole lessicali definite. Tale lista viene mostrata all'utente come suggerimento per correggere l'errore.
+    \item \texttt{Symbol token}: rappresenta il \textit{token} su cui il parser si è bloccato per via di un errore sintattico.
+    \item \texttt{int line}: linea nel file sorgente in cui si trova l'errore sintattico.
+    \item \texttt{int column}: colonna nel file sorgente in cui si trova il token causante l'errore sintattico.
+    \item \texttt{List<String> expectedTokens}: lista di stringhe che rappresentano i possibili token che il parser si aspetta sulla base della grammatica definita. Tale lista viene mostrata all'utente come suggerimento alla correzione.
 \end{itemize}
-Oltre al costruttore ed ai metodi \textit{get} per ottenere gli attributi dell'oggetto, l'unico metodo interessante è \texttt{createMessage} che sulla base degli attributi genera una stringa di errore che sarà poi usata dalla classe \texttt{Compiler.java}.
+Oltre al costruttore e ai metodi getter per ottenere gli attributi dell'oggetto, l'unico metodo interessante è \texttt{createMessage} che, sulla base degli attributi, genera una stringa di errore (principalmente usato dalla classe \texttt{Compiler}).
 
 \section{Code generation}
-A partire da un file sorgente scritto nel linguaggio riconosciuto, il compilatore genera un file oggetto eseguibile tramite la libreria \texttt{ltMacchina.jar} (o tramite lo script exec.sh per maggiore semplicità). La generazione del codice avviene in \texttt{Compiler.java} mediante la chiamata del metodo \texttt{generateCode} e la conseguente esplorazione in profondità dell'AST.
 
-\subsection{Classe Compiler}
-Il file \texttt{Compiler.java} contiene il metodo \texttt{main} che prende in input come primo argomento un file sorgente e svolge tutti i passi della compilazione fino ad ottenere il file eseguibile, il cui nome è specificato dall'utente come secondo argomento.
-Se non avvengono errori in fase di analisi sintattica, il parser restituisce un oggetto di tipo \texttt{Program} che contiene sia la Symbol table che l'AST. In caso contrario viene sollevata l'eccezione \texttt{SyntaxErrorException} e stampato il messaggio d'errore. In seguito, dopo aver inizializzato con valori random le prime 2 locazioni di memoria riservate per i valori temporanei usati nel calcolo dell'espressione MOD, per ogni descrittore contenuto nella Symbol table viene riservato un indirizzo e generato il codice per inizializzare tale indirizzo ad un valore random. Infine avviene la chiamata \texttt{instructions.generateCode(code)} che permette di scorrere in profondità l'AST e generare il codice per l'intero programma.
+A partire da un file sorgente scritto nel linguaggio riconosciuto, il compilatore genera un file oggetto eseguibile tramite la libreria \texttt{ltMacchina.jar} (o tramite lo script \texttt{exec.sh} per maggiore semplicità).
+La generazione del codice avviene in \texttt{Compiler.java} mediante la chiamata al metodo \texttt{generateCode} e la conseguente esplorazione in profondità dell'AST.
 
-\section{Esempi}
-Alcuni esempi di codice sorgente e compilato si trovano sotto la directory \texttt{examples/}. Per ogni test è stata creata una directory contenente il file sorgente e il codice compilato in formato leggibile. Alcuni di questi sorgenti non compilano in quanto contengono degli errori di sintassi. Ad esempio, il file \texttt{test8.mylang} contiene un errore alla riga 8, poiché il loop non è terminato tramite la parola riservata \texttt{endLoop}:
+\subsection{\texttt{src/main/java/lt/compiler/Compiler.java}}
+La classe \texttt{Compiler} contiene il metodo \texttt{main}, che prende come primo argomento il nome di un file sorgente, e svolge tutti i passi della compilazione fino ad ottenere il file eseguibile, il cui nome è specificato dall'utente come secondo argomento.
+Se non si verificano errori, il parser restituisce un oggetto di tipo \texttt{Program} che contiene sia la symbol table che l'AST.
+In caso contrario viene sollevata l'eccezione \texttt{SyntaxErrorException} e stampato il messaggio d'errore.
+In seguito, dopo aver inizializzato con valori random le prime 2 locazioni di memoria riservate per i valori temporanei (usate nel calcolo dell'operazione di modulo, $\%$), per ogni descrittore contenuto nella symbol table viene riservato un indirizzo di memoria, e generato il codice per inizializzare tale locazione ad un valore pseudorandom.
+Le variabili sono allocate in modo da occupare contiguamente la porzione iniziale dello stack, spostando al contempo lo stack pointer.
+Infine, avviene la chiamata \texttt{instructions.generateCode(code)} che permette di scorrere in profondità l'AST e generare il codice oggetto per l'intero programma.
+
+\section{Esempi} \label{examples}
+
+Alcuni esempi di codice sorgente e compilato si trovano all'interno della directory \texttt{examples/}.
+Per ogni test è stata creata una directory contenente il file sorgente e il codice compilato in formato leggibile.
+Uno di questi sorgenti (\texttt{test8}) non compila in quanto contiene un errore di sintassi.
+In particolare, l'errore nel file \texttt{test8.mylang} è identificato alla riga 12, poiché il corpo del ciclo non è terminato tramite la parola riservata \texttt{endLoop} in alcun punto del sorgente:
 
 \lstset{numbers=left, numberstyle=\small, numbersep=8pt, frame=leftline, xleftmargin=20pt}
-\lstset{basicstyle=\ttfamily,breaklines=true}
-\begin{lstlisting} 
-//massimo comun divisore
-x = input "Primo numero? "
-y = input "Secondo numero? "
-loop y
-    resto = x % y 
-    x = y
-    y = resto
+\lstset{basicstyle=\ttfamily, breaklines=true, showlines=true}
+\lstinputlisting{../examples/test8/test8.mylang}
 
-output "mcd = " x
-newLine
-\end{lstlisting}
-
-Se si tenta di compilarlo si ottiene il seguente errore: \\
-\texttt{[-] Syntax error at line 11, column 1: unexpected EOF token}\\
+Se si tenta di compilarlo si ottiene il seguente errore: \vspace{8pt}\\
+\texttt{[-] Syntax error at line 12, column 1: unexpected EOF token}\\
 \texttt{[-] Expected token classes are [NEWLINE, LOOP, ENDLOOP]}
+\vspace{8pt}
+
+Per comodità, è possibile compilare tutti gli esempi (rispettando la loro organizzazione in directory) eseguendo una sola volta lo script \texttt{compileExamples.sh}.
+Esso genera codice oggetto per gli esempi, sia in formato eseguibile (con estensione \texttt{.o}) che in formato leggibile (con estensione \texttt{.out}).
+
 \end{document}
+
