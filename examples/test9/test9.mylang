@@ -1,0 +1,12 @@
+//Swapping small numbers without extra variables
+a = 3, b = 5
+
+a = -(b = (a = b + a) &
+        - b)          & 
+    + a
+
+output "a = " a
+newLine
+output "b = " b
+newLine
+

@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{dirtree}
 \usepackage{hyperref}
+\usepackage{verbatim}
 
 \date{Appello di Settembre 2018}
 \author{
@@ -209,17 +210,22 @@ Infine, avviene la chiamata \texttt{instructions.generateCode(code)} che permett
 
 Alcuni esempi di codice sorgente e compilato si trovano all'interno della directory \texttt{examples/}.
 Per ogni test è stata creata una directory contenente il file sorgente e il codice compilato in formato leggibile.
-Uno di questi sorgenti (\texttt{test8}) non compila in quanto contiene un errore di sintassi.
-In particolare, l'errore nel file \texttt{test8.mylang} è identificato alla riga 12, poiché il corpo del ciclo non è terminato tramite la parola riservata \texttt{endLoop} in alcun punto del sorgente:
+Alcuni di essi (\texttt{test8} e \texttt{test9}) non compilano in quanto contengono errori di sintassi.
+In particolare, l'errore nel file \texttt{test9.mylang} è identificato alla riga 2, poiché la virgola dopo un assegnamento non è ammessa per poterne fare un altro sulla stessa riga:
 
 \lstset{numbers=left, numberstyle=\small, numbersep=8pt, frame=leftline, xleftmargin=20pt}
 \lstset{basicstyle=\ttfamily, breaklines=true, showlines=true}
-\lstinputlisting{../examples/test8/test8.mylang}
+\lstinputlisting{../examples/test9/test9.mylang}
 
-Se si tenta di compilarlo si ottiene il seguente errore: \vspace{8pt}\\
-\texttt{[-] Syntax error at line 12, column 1: unexpected EOF token}\\
-\texttt{[-] Expected token classes are [NEWLINE, LOOP, ENDLOOP]}
-\vspace{8pt}
+Se si tenta di compilarlo si ottiene il seguente errore:\vspace{1pt}
+\begin{verbatim}
+[-] Syntax error at line 2, column 6: unexpected "," token
+      a = 3, b = 5
+           ^
+[-] Expected token classes are [ADD, SUB, MUL, DIV, MOD,
+     QUESTION, ENDL]
+\end{verbatim}
+\vspace{4pt}
 
 Per comodità, è possibile compilare tutti gli esempi (rispettando la loro organizzazione in directory) eseguendo una sola volta lo script \texttt{compileExamples.sh}.
 Esso genera codice oggetto per gli esempi, sia in formato eseguibile (con estensione \texttt{.o}) che in formato leggibile (con estensione \texttt{.out}).
