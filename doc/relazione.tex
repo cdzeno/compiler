@@ -96,11 +96,11 @@ La classe di test \texttt{LexerTest.java} è stata scritta per poter testare l'a
 
 \subsection{\texttt{src/main/cup/parser.cup}}
 L'analisi sintattica è stata effettuata invece grazie all'utilizzo di CUP che ha permesso la generazione dell'Abstract Syntax Tree (AST). Il file di specifica contenente le regole grammaticali è nominato come \texttt{parser.cup}. Dalla compilazione del file di specifica \texttt{parser.cup} vengono generate le classi \texttt{Parser.java} e \texttt{ParserSym.java} che contiene le costanti enumerative corrispondenti ai simboli terminali della grammatica.
-Le regole grammaticali inserite nel file \texttt{parser.cup} aderiscono fedelmente alle specifiche indicate nel documento di specifica. Oltre alle regole grammaticali sono state inserite istruzioni Java aggiuntive al parser al fine di controllore le eccezioni ed i possibili errori generabili in fase di parsing.
-Esse riguardano l'overriding dei metodi standard usati dal parser e l'inserimento di un'eccezione creata ad hoc da noi (\texttt{SyntaxErrorException}) che verrà sfruttata nella classe \texttt{Compiler.java} per visualizzare la linea del sorgente afflitta da un errore sintattico e fornire suggerimenti su come correggere l'errore. Nei successivi paragrafi verranno descritte nel dettaglio le classi utilizzate per la modellazione e costruzione dell'AST.
+Le regole grammaticali inserite nel file \texttt{parser.cup} aderiscono fedelmente alle specifiche indicate nel documento di specifica. Oltre a ciò sono state inserite al parser istruzioni Java aggiuntive al fine di controllore le eccezioni ed i possibili errori generabili in fase di parsing.
+Esse riguardano l'overriding dei metodi standard usati dal parser e l'inserimento di un'eccezione creata ad hoc da noi (\texttt{SyntaxErrorException}) che verrà sfruttata nella classe \texttt{Compiler.java} per visualizzare la linea del sorgente afflitta da un errore sintattico e fornire suggerimenti su come correggere lo stesso. Nei successivi paragrafi verranno descritte nel dettaglio le classi utilizzate per la modellazione e costruzione dell'AST.
 
 \subsection{\texttt{src/main/java/lt/compiler/Program.java}}
-La classe \texttt{Program} viene restituita dal simbolo iniziale della grammatica e contiene la radice dell'AST, ovvero un riferimento alla sequenza principale di istruzioni del programma, oltre alla symbol table. Mediante l'utilizzo del metodo \texttt{getInstructions} è possibile ottenere il riferimento alla radice della struttura come puntatore all'oggetto di tipo \texttt{InstrSeq}.
+La classe \texttt{Program} viene restituita dal simbolo iniziale della grammatica e contiene la radice dell'AST, ovvero un riferimento alla sequenza principale di istruzioni del programma, oltre che alla symbol table. Mediante l'utilizzo del metodo \texttt{getInstructions} è possibile ottenere il riferimento alla radice della struttura come puntatore all'oggetto di tipo \texttt{InstrSeq}.
 
 \subsection{\texttt{src/main/java/lt/compiler/instr/InstrSeq.java}}
 Questa classe modella una sequenza di istruzioni sotto forma di linked list. L'unica operazione significativa in essa contenuta è \texttt{generateCode} che si occupa di generare il codice dell'istruzione di cui tiene il riferimento e richiamare il medesimo metodo sul riferimento al resto della sequenza.
@@ -165,7 +165,7 @@ La classe \texttt{SyntaxErrorException} estende \texttt{RuntimeException} e vien
 Oltre al costruttore ed ai metodi \textit{get} per ottenere gli attributi dell'oggetto, l'unico metodo interessante è \texttt{createMessage} che sulla base degli attributi genera una stringa di errore che sarà poi usata dalla classe \texttt{Compiler.java}.
 
 \section{Code generation}
-Il codice generato dal compilatore è codice macchina compatibile con il package \texttt{ltMacchina} fornito. La generazione del codice avviene in \texttt{Compiler.java} mediante la chiamata del metodo \texttt{generateCode} e la conseguente esplorazione in profondità dell'AST.
+A partire da un file sorgente scritto nel linguaggio riconosciuto, il compilatore genera un file oggetto eseguibile tramite la libreria \texttt{ltMacchina.jar} (o tramite lo script exec.sh per maggiore semplicità). La generazione del codice avviene in \texttt{Compiler.java} mediante la chiamata del metodo \texttt{generateCode} e la conseguente esplorazione in profondità dell'AST.
 
 \subsection{Classe Compiler}
 Il file \texttt{Compiler.java} contiene il metodo \texttt{main} che prende in input come primo argomento un file sorgente e svolge tutti i passi della compilazione fino ad ottenere il file eseguibile, il cui nome è specificato dall'utente come secondo argomento.
