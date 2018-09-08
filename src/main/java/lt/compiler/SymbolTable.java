@@ -11,8 +11,8 @@ public class SymbolTable implements Iterable<Descriptor> {
         table = new Vector<Descriptor>();
     }
 
-    /* Cerca il descrittore di una stringa nella tabella,
-         se non c'e' restituisce null */
+    // Look for the descriptor of an identifier inside the table.
+    // If not found, return null.
     public Descriptor find(String s) {
         int pos = table.indexOf(new Descriptor(s));
         if (pos == -1)
@@ -20,13 +20,13 @@ public class SymbolTable implements Iterable<Descriptor> {
         return table.elementAt(pos);
     }
 
-    /* Aggiunge un descrittore alla tabella */
+    // Insert a descriptor inside the table.
     public void insert(Descriptor d) {
         table.add(d);
     }
 
-    /* Cerca il descrittore di una stringa nella tabella,
-         se non c'e' lo aggiunge */
+    // Look for the descriptor of an identifier inside the table.
+    // If not found, insert it into the table.
     public Descriptor findInsert(String s) {
         Descriptor d = find(s);
         if (d == null) {
@@ -40,3 +40,4 @@ public class SymbolTable implements Iterable<Descriptor> {
         return table.iterator();
     }
 }
+

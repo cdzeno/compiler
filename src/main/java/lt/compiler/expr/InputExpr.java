@@ -16,7 +16,10 @@ public class InputExpr implements Expr {
     }
 
     public void generateCode(Codice c) {
+        // Print out the prompt
         new OutputInstr(prompt).generateCode(c);
+
+        // then ask for the input
         c.genera(INPUT);
     }
 

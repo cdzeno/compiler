@@ -19,3 +19,4 @@ public class Program {
         return symbolTable;
     }
 }
+

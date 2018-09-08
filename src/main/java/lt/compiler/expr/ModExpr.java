@@ -16,14 +16,14 @@ public class ModExpr implements Expr {
         leftExpr.generateCode(c);
         rightExpr.generateCode(c);
 
-        // Insert into special MOD register the result
-        // of the left and right expr
+        // Move the results of the left and right
+        // expressions into the reserved registers
         c.genera(POP, 1);
         c.genera(POP, 0);
 
-        // Code used to compute MOD making: a - b * (a / b)
-        // where a = 0 register
-        // and   b = 1 register
+        // Code used to compute module as: a - b * (a / b)
+        // where a = register 0
+        // and   b = register 1
         c.genera(PUSH, 0);
         c.genera(PUSH, 1);
         c.genera(PUSH, 0);

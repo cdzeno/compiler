@@ -15,7 +15,10 @@ public class AssignExpr implements Expr {
     }
 
     public void generateCode(Codice c) {
+        // Generate code as if it were an assignment instruction
         new AssignInstr(descriptor, expr).generateCode(c);
+
+        // but leave the assigned value on the top of the stack
         new IdExpr(descriptor).generateCode(c);
     }
 

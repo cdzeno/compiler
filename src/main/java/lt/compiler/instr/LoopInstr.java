@@ -14,23 +14,23 @@ public class LoopInstr implements Instr {
     }
 
     public void generateCode(Codice c) {
-        // Save address of loop begin:
+        // Save address of loop begin
         int begin = c.indirizzoProssimaIstruzione();
 
-        // Generate code for the loop-condition:
+        // Generate code for the loop condition
         cond.generateCode(c);
 
-        // Save address of the end of code-codition:
+        // Jump out of the loop if condition evaluates to false
         int jumpEnd = c.generaParziale(JZERO);
 
-        // Generate code for the body of loop instruction:
+        // Generate code for the body of the loop
         body.generateCode(c);
 
-        // Unconditional jump to the end of body loop:
+        // Unconditional jump to the beginning of the loop (repeat)
         c.genera(JUMP, begin);
 
-        // Now that I know the address of the next istruction of the body
-        // I can complete the initial jump instruction for false loop condition:
+        // Complete the jump out of the loop (false condition),
+        // now that the end of the loop code is known
         c.completaIstruzione(jumpEnd, c.indirizzoProssimaIstruzione());
     }
 
@@ -38,3 +38,4 @@ public class LoopInstr implements Instr {
         return "loop " + cond.toString() + "\n" + body + "\nendLoop";
     }
 }
+

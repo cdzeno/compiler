@@ -22,15 +22,19 @@ public class OutputInstr implements Instr {
     }
 
     public void generateCode(Codice c) {
+        // First, evaluate the expression (if given) and leave
+        // the result onto the stack
         if (expr != null) {
             expr.generateCode(c);
         }
 
+        // Print the string (char-by-char)
         for (char ch : output.toCharArray()) {
             c.genera(PUSHIMM, ch);
             c.genera(OUTPUTCH);
         }
-        
+
+        // Finally, print out the result of the expression (if given)
         if (expr != null) {
             c.genera(OUTPUT);
         }

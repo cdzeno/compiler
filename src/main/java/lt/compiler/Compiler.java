@@ -10,8 +10,9 @@ import static lt.macchina.Macchina.*;
 
 public class Compiler {
 
+    // Function used to parse 'SyntaxErrorException' and
+    // pretty-print the exception
     private static void printErrorLine(String file, SyntaxErrorException e) {
-        // Function used to parse 'SyntaxErrorException' and pretty-print the exception:
         BufferedReader reader;
         String line = null;
 
@@ -36,6 +37,7 @@ public class Compiler {
 
             } catch (IOException io) {
                 System.err.println("[-] Error while parsing file \"" + file + "\"");
+                System.exit(1);
             }
         }
 
@@ -49,15 +51,14 @@ public class Compiler {
         }
 
         BufferedReader in = null;
-
         try {
             in = new BufferedReader(new FileReader(args[0]));
         } catch (FileNotFoundException e) {
             System.err.println("[-] Error while reading \"" + args[0] + "\"");
             System.exit(1);
         }
-        
-        // Initialize object used during lexical analysis and parsing phase:
+
+        // Initialize objects used during lexical analysis and parsing phase
         ComplexSymbolFactory sf = new ComplexSymbolFactory();
         Scanner scanner = new Scanner(in, sf);
         Parser parser = new Parser(scanner, sf);
@@ -66,7 +67,7 @@ public class Compiler {
         try {
             result = parser.parse();
         } catch (SyntaxErrorException e) {
-            // Catch Syntax error and pretty-print it:
+            // Catch syntax error and pretty-print it
             printErrorLine(args[0], e);
             System.exit(1);
         } catch (Exception e) {
@@ -74,31 +75,32 @@ public class Compiler {
             e.printStackTrace();
             System.exit(1);
         }
-        
+
         if (result.value instanceof Program) {
-            // Parse final symbol of the parsing:
+            // Get resulting object of the parsing
             Program program = (Program) result.value;
 
-            // Get AST and Symbol Table:
+            // Get AST and symbol table
             InstrSeq instructions = program.getInstructions();
             SymbolTable symbolTable = program.getSymbolTable();
 
-            // Initialize object for object generation:
+            // Initialize object for code generation
             Codice code = new Codice(args[1]);
 
             // Reserve space for MOD registers (0-1) and variables (2...)
             Random rand = new Random();
-            int nextFreeAddr = 2;
             code.genera(PUSHIMM, rand.nextInt());
             code.genera(PUSHIMM, rand.nextInt());
 
-            // For-each symbol into the Symbol table reserve space for the variable:
+            // For each descriptor inside the symbol table,
+            // reserve space for the associated variable
+            int nextFreeAddr = 2;
             for (Descriptor d : symbolTable) {
                 nextFreeAddr = d.assignAddress(nextFreeAddr);
                 code.genera(PUSHIMM, rand.nextInt());
             }
 
-            // Generating the code of the program:
+            // Generate the object code of the program
             instructions.generateCode(code);
             code.genera(HALT);
 

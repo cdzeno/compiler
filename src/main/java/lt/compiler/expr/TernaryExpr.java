@@ -15,27 +15,26 @@ public class TernaryExpr implements Expr {
     }
 
     public void generateCode(Codice c) {
-        // Generate code for the codition of the ternary operator:
+        // Generate code for the codition of the ternary operator
         condition.generateCode(c);
 
-        // Generate code for the jump in case of false condition:
+        // Generate code for the jump in case of false condition
         int jumpFalse = c.generaParziale(JZERO);
 
-        // Generate code in case of true condition:
+        // Generate code for the expression in case of true condition
         trueExpr.generateCode(c);
-
-        // Generate code for the jump in case of true condition:
+        // Jump to avoid evaluating false-case expression
         int jumpEnd = c.generaParziale(JUMP);
 
-        // Complete the false-jump instruction now that I know at which
-        // address is the false-case code:
+        // Complete the false-jump instruction now that the jump
+        // address is known
         c.completaIstruzione(jumpFalse, c.indirizzoProssimaIstruzione());
 
-        // Generate the false-case code:
+        // Generate the false-case expression code
         falseExpr.generateCode(c);
 
-        // Now that I know where the ternary operator ends, complete the
-        // unconditional jump used after the true-case code:
+        // Complete the unconditional jump from the end of the true-case
+        // expression code, now that the jump address is known
         c.completaIstruzione(jumpEnd, c.indirizzoProssimaIstruzione());
     }
 

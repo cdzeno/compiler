@@ -15,27 +15,28 @@ import java_cup.runtime.*;
 
 %{
     ComplexSymbolFactory sf;
+
     public Scanner(java.io.Reader in, ComplexSymbolFactory sf) {
         this(in);
         this.sf = sf;
     }
 
-	public int currentLineNumber() {
-		return yyline + 1;
-	}
+    public int currentLineNumber() {
+        return yyline + 1;
+    }
 
-	public int currentColumnNumber(){
-		return yycolumn + 1;
-	}
+    public int currentColumnNumber() {
+        return yycolumn + 1;
+    }
 %}
 
-LETTER              = [:letter:]
-DEC_DIGIT           = [:digit:]
-HEX_DIGIT           = [a-fA-F] | {DEC_DIGIT}
-ENDL                = \r | \n | \r\n
-SPACE				= [\ \t\f] | {ENDL}
-STRING_LIT			= "\"" ("\\\""|[^\n\r\"])* "\""
-COMMENT				= "//" .*
+LETTER      = [:letter:]
+DEC_DIGIT   = [:digit:]
+HEX_DIGIT   = [a-fA-F] | {DEC_DIGIT}
+ENDL        = \r | \n | \r\n
+SPACE       = [\ \t\f] | {ENDL}
+STRING_LIT  = "\"" ("\\\""|[^\n\r\"])* "\""
+COMMENT     = "//" .*
 
 %%
 
@@ -69,6 +70,6 @@ COMMENT				= "//" .*
 ^{ENDL}              { }
 {ENDL}               { return sf.newSymbol("ENDL", ParserSym.ENDL); }
 
-{SPACE} { }
+{SPACE}              { }
 .                    { return sf.newSymbol("error", ParserSym.error, yytext()); }
 <<EOF>>              { return sf.newSymbol("EOF", ParserSym.EOF); }

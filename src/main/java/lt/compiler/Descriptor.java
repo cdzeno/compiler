@@ -26,6 +26,9 @@ public class Descriptor {
         return length;
     }
 
+    // Assign a number of consecutive addresses equal to length,
+    // and starting from the address addr (included).
+    // Return the first address after this allocated block.
     public int assignAddress(int addr) {
         address = addr;
         return address + length;
@@ -47,3 +50,4 @@ public class Descriptor {
         return identifier + "@" + address + "~" + length;
     }
 }
+

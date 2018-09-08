@@ -31,7 +31,7 @@ parser code {:
     public List<String> expected_tokens() {
         List<Integer> ids = expected_token_ids();
         LinkedList<String> list = new LinkedList<String>();
-         
+
         for (Integer expected : ids)
             list.add(symbl_name_from_id(expected));
 
