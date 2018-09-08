@@ -14,13 +14,23 @@ public class LoopInstr implements Instr {
     }
 
     public void generateCode(Codice c) {
+        // Save address of loop begin:
         int begin = c.indirizzoProssimaIstruzione();
+
+        // Generate code for the loop-condition:
         cond.generateCode(c);
+
+        // Save address of the end of code-codition:
         int jumpEnd = c.generaParziale(JZERO);
 
+        // Generate code for the body of loop instruction:
         body.generateCode(c);
+
+        // Unconditional jump to the end of body loop:
         c.genera(JUMP, begin);
 
+        // Now that I know the address of the next istruction of the body
+        // I can complete the initial jump instruction for false loop condition:
         c.completaIstruzione(jumpEnd, c.indirizzoProssimaIstruzione());
     }
 

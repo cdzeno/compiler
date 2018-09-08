@@ -11,6 +11,7 @@ import static lt.macchina.Macchina.*;
 public class Compiler {
 
     private static void printErrorLine(String file, SyntaxErrorException e) {
+        // Function used to parse 'SyntaxErrorException' and pretty-print the exception:
         BufferedReader reader;
         String line = null;
 
@@ -56,6 +57,7 @@ public class Compiler {
             System.exit(1);
         }
         
+        // Initialize object used during lexical analysis and parsing phase:
         ComplexSymbolFactory sf = new ComplexSymbolFactory();
         Scanner scanner = new Scanner(in, sf);
         Parser parser = new Parser(scanner, sf);
@@ -64,6 +66,7 @@ public class Compiler {
         try {
             result = parser.parse();
         } catch (SyntaxErrorException e) {
+            // Catch Syntax error and pretty-print it:
             printErrorLine(args[0], e);
             System.exit(1);
         } catch (Exception e) {
@@ -73,10 +76,14 @@ public class Compiler {
         }
         
         if (result.value instanceof Program) {
+            // Parse final symbol of the parsing:
             Program program = (Program) result.value;
+
+            // Get AST and Symbol Table:
             InstrSeq instructions = program.getInstructions();
             SymbolTable symbolTable = program.getSymbolTable();
 
+            // Initialize object for object generation:
             Codice code = new Codice(args[1]);
 
             // Reserve space for MOD registers (0-1) and variables (2...)
@@ -84,11 +91,14 @@ public class Compiler {
             int nextFreeAddr = 2;
             code.genera(PUSHIMM, rand.nextInt());
             code.genera(PUSHIMM, rand.nextInt());
+
+            // For-each symbol into the Symbol table reserve space for the variable:
             for (Descriptor d : symbolTable) {
                 nextFreeAddr = d.assignAddress(nextFreeAddr);
                 code.genera(PUSHIMM, rand.nextInt());
             }
 
+            // Generating the code of the program:
             instructions.generateCode(code);
             code.genera(HALT);
 
