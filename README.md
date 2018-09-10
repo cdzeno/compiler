@@ -7,10 +7,7 @@ Made by [Gabriele Quagliarella](https://www.github.com/cdzeno) and [Emmanuel Esp
 ## Setup
 The compiler is written in Java and is based on [JFlex](http://jflex.de/) and [CUP](http://www2.cs.tum.edu/projects/cup/), respectively scanner and parser generators.
 
-The JFlex installation is required and can be easily done by issuing the following command (on Debian-based distros):
-```bash
-sudo apt install jflex
-```
+The JFlex installation should not be required thanks to Gradle.
 
 JAR libraries for CUP and the [stack machine](http://pighizzini.di.unimi.it/linguaggi/?a=gc2018) assembler are already present inside the directory lib/ of the project.
 
@@ -25,11 +22,11 @@ To compile a source file, you can run the script `compile.sh` with the filename 
 The object file can be executed with the stack machine interpreter by running the script `exec.sh`, with its name as an argument (it also accepts debugging options).
 
 ## Example
-For example, if you want to compile the source code `examples/test_8.mylang` type:
+For example, if you want to compile the source code `examples/test1/test1.mylang` type:
 ```bash
-./compile.sh examples/test_8.mylang test_8
+./compile.sh examples/test1/test1.mylang test1
 ```
-If there aren't any syntax errors, the compiler produces the object file `test_8` that can be run issuing:
+If there aren't any syntax errors, the compiler produces the object file `test1` that can be run issuing:
 ```bash
-./exec.sh test_8
+./exec.sh test1
 ```
