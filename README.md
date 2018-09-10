@@ -15,11 +15,21 @@ sudo apt install jflex
 JAR libraries for CUP and the [stack machine](http://pighizzini.di.unimi.it/linguaggi/?a=gc2018) assembler are already present inside the directory lib/ of the project.
 
 ## Build
-Building the compiler is straightforward, and can be accomplished by issuing the following command:
+Building the compiler is straightforward and can be accomplished using Gradle by issuing the following command:
 ```bash
-make compiler
+./gradlew build
 ```
 
 ## Running
-To compile a source file, you can run the script `compile.sh` with the filename as the first argument.
-The object file is named `eseguibile` by default and can be executed with the stack machine interpreter by running the script `exec.sh`, with its name as an argument (it also accepts debugging options).
+To compile a source file, you can run the script `compile.sh` with the filename as the first argument and the object filename as second argument.
+The object file can be executed with the stack machine interpreter by running the script `exec.sh`, with its name as an argument (it also accepts debugging options).
+
+## Example
+For example, if you want to compile the source code `examples/test_8.mylang` type:
+```bash
+./compile.sh examples/test_8.mylang test_8
+```
+If there aren't any syntax errors, the compiler produces the object file `test_8` that can be run issuing:
+```bash
+./exec.sh test_8
+```
